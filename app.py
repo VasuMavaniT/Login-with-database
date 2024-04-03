@@ -49,7 +49,7 @@ def login():
                 flash('Login successful!', 'success')
                 return render_template('success.html', username=username)
             else:
-                flash('Combination of username and password doesn\'t exist', 'error')
+                return render_template('login_unsuccess.html')
     
     return render_template('login.html', form=form)
 
