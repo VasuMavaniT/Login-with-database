@@ -1,0 +1,7 @@
+pytest
+selenium
+flask
+wtforms
+flask-wtf
+flask_sqlalchemy
+psycopg2

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h2>Login</h2>
+    <form id="loginForm" method="post">
+        {{ form.hidden_tag() }}
+        <p><label for="username">Username:</label><br><input type="text" id="username" name="username"></p>
+        <p class="error usernameError"></p> <!-- Error message for username -->
+        <p><label for="password">Password:</label><br><input type="password" id="password" name="password"></p>
+        <p class="error passwordError"></p> <!-- Error message for password -->
+        <p><input type="submit" id="submit" name="submit" value="Submit"></p>
+    </form>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            var username = document.getElementById('username').value.trim();
+            var password = document.getElementById('password').value.trim();
+            var usernameError = document.querySelector('.usernameError');
+            var passwordError = document.querySelector('.passwordError');
+            var isValid = true;
+
+            if (username === '') {
+                usernameError.textContent = 'Username is required.';
+                isValid = false;
+            } else {
+                usernameError.textContent = ''; // Clear the error message
+            }
+
+            if (password === '') {
+                passwordError.textContent = 'Password is required.';
+                isValid = false;
+            } else {
+                passwordError.textContent = ''; // Clear the error message
+            }
+
+            if (!isValid) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+    </script>
+</body>
+</html>
