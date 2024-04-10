@@ -15,7 +15,7 @@ conn.autocommit = True
 cur = conn.cursor()
 
 # Execute SELECT query to fetch all records
-cur.execute("SELECT * FROM Users;")
+cur.execute("SELECT * FROM UsersData;")
 
 # Fetch all records
 records = cur.fetchall()
