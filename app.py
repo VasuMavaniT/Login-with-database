@@ -4,6 +4,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired
 import psycopg2
 import secrets
+import bcrypt
 
 secret_key = secrets.token_hex(16)
 
@@ -15,19 +16,65 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[InputRequired()])
     submit = SubmitField('Submit')
 
-def check_credentials(username, password):
-    # Connect to PostgreSQL server
-    conn = psycopg2.connect(
-        dbname="mydatabase",
-        user="postgres",
-        password="admin",
-        host="localhost"
-    )
-    cur = conn.cursor()
-    cur.execute("SELECT username, role FROM UsersData WHERE username = %s AND password = %s", (username, password))
-    user = cur.fetchone()
-    cur.close()
-    return user
+def authenticate_user(username, password):
+    conn, cur = connect_db()
+    if conn and cur:
+        try:
+            cur.execute("SELECT password, role FROM UsersData WHERE username = %s", (username,))
+            user_record = cur.fetchone()
+            if user_record:
+                stored_password, user_role = user_record
+                # Convert the stored password from string to bytes
+                stored_password_bytes = stored_password.encode('utf-8')
+                # Convert the provided password to bytes
+                provided_password_bytes = password.encode('utf-8')
+                # Use bcrypt's checkpw method to compare the provided password with the stored hash
+                if bcrypt.checkpw(provided_password_bytes, stored_password_bytes):
+                    # If the passwords match, return the username and role
+                    return username, user_role
+            # If authentication fails, return None
+            return None
+        except psycopg2.Error as e:
+            print("Error executing SQL query:", e)
+        finally:
+            close_db(conn, cur)
+    # If database connection fails, return None
+    return None
+
+def close_db(conn, cur):
+    if cur:
+        cur.close()
+    if conn:
+        conn.close()
+
+def connect_db():
+    try:
+        conn = psycopg2.connect(
+            dbname="mydatabase",
+            user="postgres",
+            password="admin",
+            host="localhost"
+        )
+        return conn, conn.cursor()
+    except psycopg2.Error as e:
+        print("Error connecting to the database:", e)
+        return None, None
+    
+    
+
+# def check_credentials(username, password):
+#     # Connect to PostgreSQL server
+#     conn = psycopg2.connect(
+#         dbname="mydatabase",
+#         user="postgres",
+#         password="admin",
+#         host="localhost"
+#     )
+#     cur = conn.cursor()
+#     cur.execute("SELECT username, role FROM UsersData WHERE username = %s AND password = %s", (username, password))
+#     user = cur.fetchone()
+#     cur.close()
+#     return user
 
 def create_new_user(username, password, role):
     conn = psycopg2.connect(
@@ -86,7 +133,6 @@ def get_users_by_role(role):
     conn.close()
     return users
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -96,18 +142,15 @@ def login():
         password = form.password.data
         
         # Check if either username or password is missing
-        if not username:
-            flash('Username is required.', 'error')
-        elif not password:
-            flash('Password is required.', 'error')
+        if not username or not password:
+            flash('Invalid username or password.', 'error')
         else:
-            # Check credentials
-            user = check_credentials(username, password)
+            user = authenticate_user(username, password)
             if user:
                 flash('Login successful!', 'success')
                 return redirect(url_for('dashboard', username=user[0], role=user[1]))
             else:
-                return render_template('login_unsuccess.html')
+                flash('Invalid username or password.', 'error')
     
     return render_template('login.html', form=form)
 
@@ -186,8 +229,19 @@ def assign_role():
 
     return render_template('assign_role.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
 
+@app.route('/show_all_users')
+def show_all_users():
+    users = get_all_users()  # Reuse the existing function to fetch all users
+    return render_template('show_all_users.html', users=users)
 
-
+def verify_password(stored_password, provided_password):
+    # Convert the provided password to bytes
+    provided_password_bytes = provided_password.encode('utf-8')
+    # Use bcrypt's checkpw method to compare the passwords
+    if bcrypt.checkpw(provided_password_bytes, stored_password):
+        return True
+    else:
+        return False
 
 if __name__ == '__main__':
     app.run(debug=True, port=8097)
