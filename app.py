@@ -11,6 +11,10 @@ secret_key = secrets.token_hex(16)
 app = Flask(__name__)
 app.secret_key = secret_key
 
+def hash_password(password):
+    """Hash a password for storing."""
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()])
@@ -91,7 +95,9 @@ def create_new_user(username, password, role):
     if user:
         flash('Username already exists!', 'error')
     else:
-        cur.execute("INSERT INTO UsersData (username, password, role) VALUES (%s, %s, %s);", (username, password, role))
+        temp = hash_password(password)
+        hashed_password = temp.decode('utf-8')
+        cur.execute("INSERT INTO UsersData (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
         conn.commit()
         flash('User created successfully!', 'success')
     cur.close()
@@ -163,37 +169,27 @@ def dashboard():
         return render_template('admin_dashboard.html', username=username)
     elif role == 'developer':
         return render_template('developer_dashboard.html', username=username)
-    elif role == 'end_user':
+    elif role == 'user':
         return render_template('end_user_dashboard.html', username=username)
     else:
         return 'Role not recognized!', 403
     
-@app.route('/template1')
-def template1():
+@app.route('/admin1')
+def admin1():
     # You might want to check the user's role and take appropriate action
-    return render_template('template1.html')
+    return render_template('admin1.html')
 
-@app.route('/template2')
-def template2():
+@app.route('/admin2')
+def admin2():
     # You might want to check the user's role and take appropriate action
-    return render_template('template2.html')
+    return render_template('admin2.html')
 
-@app.route('/template3')
-def template3():
+@app.route('/admin3')
+def admin3():
     # You might want to check the user's role and take appropriate action
-    return render_template('template3.html')
+    return render_template('admin3.html')
 
-@app.route('/template4')
-def template4():
-    # You might want to check the user's role and take appropriate action
-    return render_template('template4.html')
-
-@app.route('/template5')
-def template5():
-    # You might want to check the user's role and take appropriate action
-    return render_template('template5.html')
-
-@app.route('/assign_role', methods=['GET', 'POST'])
+@app.route('/admin4', methods=['GET', 'POST'])
 def assign_role():
     users = []  # Initialize an empty list for users
     selected_role = None  # Keep track of the selected role for deletion
@@ -228,6 +224,34 @@ def assign_role():
                 return redirect(url_for('assign_role'))
 
     return render_template('assign_role.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
+
+@app.route('/admin5')
+def admin5():
+    return render_template('admin5.html')
+
+@app.route('/admin6')
+def admin6():
+    return render_template('admin6.html')
+
+@app.route('/developer1')
+def developer1():
+    return render_template('developer1.html')
+
+@app.route('/developer2')
+def developer2():
+    return render_template('developer2.html')
+
+@app.route('/developer3')
+def developer3():
+    return render_template('developer3.html')
+
+@app.route('/user1')
+def user1():
+    return render_template('user1.html')
+
+@app.route('/user2')
+def user2():
+    return render_template('user2.html')
 
 @app.route('/show_all_users')
 def show_all_users():
