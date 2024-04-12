@@ -2,7 +2,7 @@ import psycopg2
 
 try:
     conn = psycopg2.connect(
-        dbname="mydatabase",
+        dbname="postgres",
         user="postgres",
         password="admin",
         host="localhost"
@@ -12,7 +12,7 @@ try:
     cur = conn.cursor()
 
     # SQL statement to drop the table
-    drop_table_query = "DROP TABLE IF EXISTS UsersData;"
+    drop_table_query = "DROP TABLE IF EXISTS usersdata;"
 
     # Execute the SQL statement
     cur.execute(drop_table_query)
@@ -20,7 +20,7 @@ try:
     # Commit the transaction
     conn.commit()
 
-    print("Table 'UsersData' deleted successfully")
+    print("Table 'usersdata' deleted successfully")
 
 except psycopg2.Error as e:
     print("Error deleting table:", e)

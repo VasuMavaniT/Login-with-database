@@ -2,7 +2,7 @@ import psycopg2
 
 # Connect to PostgreSQL server
 conn = psycopg2.connect(
-    dbname="mydatabase",  # Your database name
+    dbname="postgres",  # Your database name
     user="postgres",      # Default superuser
     password="admin",     # Password for the superuser
     host="localhost"      # Host where PostgreSQL is running
@@ -15,7 +15,7 @@ conn.autocommit = True
 cur = conn.cursor()
 
 # Execute SELECT query to fetch all records
-cur.execute("SELECT * FROM UsersData;")
+cur.execute("SELECT * FROM usersdata;")
 
 # Fetch all records
 records = cur.fetchall()
