@@ -5,11 +5,16 @@ from wtforms.validators import InputRequired
 import psycopg2
 import secrets
 import bcrypt
+import redis
+import logging
 
 secret_key = secrets.token_hex(16)
 
 app = Flask(__name__)
 app.secret_key = secret_key
+
+# Setup Redis
+redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
@@ -24,7 +29,7 @@ class RegistrationForm(FlaskForm):
 def connect_db():
     try:
         conn = psycopg2.connect(
-            dbname="mydatabase",
+            dbname="postgres",
             user="postgres",
             password="admin",
             host="localhost"
@@ -41,14 +46,13 @@ def close_db(conn, cur):
         conn.close()
 
 def hash_password(password):
-    """Hash a password for storing."""
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
 def authenticate_user(username, password):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT password, role FROM UsersData WHERE username = %s", (username,))
+            cur.execute("SELECT password, role FROM usersdata WHERE username = %s", (username,))
             user_record = cur.fetchone()
             if user_record:
                 stored_password, user_role = user_record
@@ -65,15 +69,17 @@ def create_new_user(username, password, role='user'):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT * FROM UsersData WHERE username = %s", (username,))
+            cur.execute("SELECT * FROM usersdata WHERE username = %s", (username,))
             if cur.fetchone() is None:
                 hashed_password = hash_password(password).decode('utf-8')
-                cur.execute("INSERT INTO UsersData (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
+                cur.execute("INSERT INTO usersdata (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
                 conn.commit()
+                # Invalidate cache
+                redis_client.delete('all_users')
                 flash('User created successfully!', 'success')
                 return True
             else:
-                flash('Username already exists!', 'error')
+                # flash('Username already exists!', 'error')
                 return False
         except psycopg2.Error as e:
             print("Error executing SQL:", e)
@@ -82,11 +88,22 @@ def create_new_user(username, password, role='user'):
     return False
 
 def get_all_users():
+    # Check cache first
+    users = redis_client.get('all_users')
+    if users:
+        # logging.info("Fetching from cache: All Users")
+        print("Fetching from cache: All Users")
+        return eval(users)
+
+    # Fetch from database if not in cache
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT username, role FROM UsersData;")
+            cur.execute("SELECT username, role FROM usersdata;")
             users = cur.fetchall()
+            redis_client.set('all_users', str(users), ex=120)  # Cache for 1 hour
+            # logging.info("Fetching from database and setting cache: All Users")
+            print("Fetching from database and setting cache: All Users")
             return users
         finally:
             close_db(conn, cur)
@@ -96,8 +113,10 @@ def update_user(username, role):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("UPDATE UsersData SET role = %s WHERE username = %s;", (role, username))
+            cur.execute("UPDATE usersdata SET role = %s WHERE username = %s;", (role, username))
             conn.commit()
+            # Invalidate cache
+            redis_client.delete('all_users')
         finally:
             close_db(conn, cur)
 
@@ -105,24 +124,32 @@ def delete_user(username):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("DELETE FROM UsersData WHERE username = %s;", (username,))
+            cur.execute("DELETE FROM usersdata WHERE username = %s;", (username,))
             conn.commit()
+            # Invalidate cache
+            redis_client.delete('all_users')
         finally:
             close_db(conn, cur)
 
 def get_users_by_role(role):
+    # Check cache first
+    cached_users = redis_client.get(f'users_by_role:{role}')
+    if cached_users:
+        logging.info(f"Fetching from cache: Users by role {role}")
+        return eval(cached_users)
+
+    # Fetch from database if not in cache
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT username, role FROM UsersData WHERE role = %s;", (role,))
+            cur.execute("SELECT username, role FROM usersdata WHERE role = %s;", (role,))
             users = cur.fetchall()
+            redis_client.set(f'users_by_role:{role}', str(users), ex=3600)  # Cache for 1 hour
+            logging.info(f"Fetching from database and setting cache: Users by role {role}")
             return users
         finally:
             close_db(conn, cur)
     return []
-
-def verify_password(stored_password, provided_password):
-    return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
