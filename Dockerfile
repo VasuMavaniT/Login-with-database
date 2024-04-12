@@ -1,48 +1,30 @@
-# Use Ubuntu 22.04 as base image
-FROM ubuntu:22.04
+# Use an official Python image. Choose a version that suits your application.
+FROM python:3.8-slim
 
-# Set environment variables for Postgres
-ENV POSTGRES_DB=mydatabase
-ENV POSTGRES_USER=postgres
-ENV POSTGRES_PASSWORD=admin
+# Set an environment variable to make Python not buffer stdout and stderr (this is useful for logging)
+ENV PYTHONUNBUFFERED=1
 
-# Install required packages
+# Install system dependencies including libpq-dev
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip postgresql && \
-    apt-get clean && \
+    apt-get install -y --no-install-recommends libpq-dev  && \
     rm -rf /var/lib/apt/lists/*
 
-# Create Python virtual environment
-RUN python3 -m venv /venv
-
-# Activate the virtual environment
-SHELL ["/bin/bash", "-c"]
-RUN source /venv/bin/activate
-
-# Copy and install Python dependencies
-COPY requirements.txt /app/requirements.txt
+# Set the working directory in the container to /app
 WORKDIR /app
-RUN /venv/bin/pip install --upgrade pip && \
-    /venv/bin/pip install -r requirements.txt
 
-# Expose PostgreSQL port
-EXPOSE 5432
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# Start PostgreSQL service
-RUN service postgresql start
+# Install Python dependencies
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-# Create PostgreSQL database and user with necessary rights
-USER postgres
-RUN    /etc/init.d/postgresql start &&\
-    psql --command "CREATE DATABASE $POSTGRES_DB;" &&\
-    psql --command "ALTER USER $POSTGRES_USER WITH ENCRYPTED PASSWORD '$POSTGRES_PASSWORD';" &&\
-    psql --command "GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_DB TO $POSTGRES_USER;"
-
-# Run the python file database.py
-RUN python3 database.py
-
-# Expose the port on which the Python application will run
+# Expose the port your app runs on
 EXPOSE 8097
 
-# Start the Python application
-CMD ["/venv/bin/python", "app.py"]
+# Set environment variables used by the flask command
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+
+# Start the application using the flask run command
+CMD ["flask", "run", "--port=8097"]

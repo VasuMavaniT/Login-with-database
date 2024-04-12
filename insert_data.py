@@ -25,22 +25,24 @@ role_counters = {
     'user': 1
 }
 
-# Connect to PostgreSQL server
-conn = psycopg2.connect(
-    dbname="postgres",  # Your database name
-    user="postgres",      # Default superuser
-    password="admin",     # Password for the superuser
-    host="localhost"      # Host where PostgreSQL is running
-)
-conn.autocommit = True
-cur = conn.cursor()
+def insert_initial_data():
+    # Connect to PostgreSQL server
+    conn = psycopg2.connect(
+        dbname="mydatabase",
+        user="postgres",
+        password="postgres",
+        host="db",
+        port=5432
+    )
+    conn.autocommit = True
+    cur = conn.cursor()
 
-# Insert 100 random records into the table
-for i in range(100):
-    username, hashed_password, role = generate_random_data(role_counters)
-    cur.execute("INSERT INTO usersdata (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
+    # Insert 100 random records into the table
+    for i in range(100):
+        username, hashed_password, role = generate_random_data(role_counters)
+        cur.execute("INSERT INTO usersdata (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
 
-# Close cursor and connection
-cur.close()
-conn.close()
-print("Table 'usersdata' updated successfully with 100 random records inserted.")
+    # Close cursor and connection
+    cur.close()
+    conn.close()
+    print("Table 'usersdata' updated successfully with 100 random records inserted.")

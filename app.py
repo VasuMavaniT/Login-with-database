@@ -7,6 +7,7 @@ import secrets
 import bcrypt
 import redis
 import logging
+from insert_data import insert_initial_data
 
 secret_key = secrets.token_hex(16)
 
@@ -14,7 +15,7 @@ app = Flask(__name__)
 app.secret_key = secret_key
 
 # Setup Redis
-redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+redis_client = redis.Redis(host='redis', port=6379, db=0, decode_responses=True)
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
@@ -29,10 +30,11 @@ class RegistrationForm(FlaskForm):
 def connect_db():
     try:
         conn = psycopg2.connect(
-            dbname="postgres",
+            dbname="mydatabase",
             user="postgres",
-            password="admin",
-            host="localhost"
+            password="postgres",
+            host="db",
+            port=5432
         )
         return conn, conn.cursor()
     except psycopg2.Error as e:
@@ -101,7 +103,7 @@ def get_all_users():
         try:
             cur.execute("SELECT username, role FROM usersdata;")
             users = cur.fetchall()
-            redis_client.set('all_users', str(users), ex=120)  # Cache for 1 hour
+            redis_client.set('all_users', str(users), ex=3600)  # Cache for 1 hour
             # logging.info("Fetching from database and setting cache: All Users")
             print("Fetching from database and setting cache: All Users")
             return users
@@ -151,6 +153,28 @@ def get_users_by_role(role):
             close_db(conn, cur)
     return []
 
+
+@app.route('/')
+def home():
+    # Check and insert data if the table is empty
+    conn, cur = connect_db()
+    if conn and cur:
+        try:
+            cur.execute("SELECT COUNT(*) FROM usersdata")
+            if cur.fetchone()[0] == 0:
+                # Run data insertion in the background
+                from threading import Thread
+                thread = Thread(target=insert_initial_data)
+                thread.start()
+        except psycopg2.Error as e:
+            print("Database query failed:", e)
+        finally:
+            close_db(conn, cur)
+
+    # Render the home page
+    return render_template('home.html')
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -187,40 +211,63 @@ def dashboard():
     else:
         return 'Role not recognized!', 403
 
-@app.route('/admin1')
+@app.route('/manage_profile')
 def admin1():
-    return render_template('admin1.html')
+    return render_template('manage_profile.html')
 
-@app.route('/admin2')
+@app.route('/view_notifications')
 def admin2():
-    return render_template('admin2.html')
+    return render_template('view_notifications.html')
 
-@app.route('/admin3')
+@app.route('/debug_logs')
 def admin3():
-    return render_template('admin3.html')
+    return render_template('debug_logs.html')
 
-@app.route('/admin4', methods=['GET', 'POST'])
+@app.route('/manage_users', methods=['GET', 'POST'])
 def assign_role():
-    users = get_all_users()
-    roles = ['admin', 'developer', 'user']
+    users = []  # Initialize an empty list for users
+    selected_role = None  # Keep track of the selected role for deletion
+    roles = ['admin', 'developer', 'user']  # Assuming these are your roles
+    is_delete = False
+    is_update = False
+
     if request.method == 'POST':
         action = request.form.get('action')
-        selected_role = request.form.get('role')
         if action == 'create':
-            create_new_user(request.form.get('username'), request.form.get('password'), request.form.get('role'))
-        elif action == 'update':
-            update_user(request.form.get('username'), request.form.get('role'))
+            create_new_user(request.form.get('username'), request.form.get('password'), request.form.get('role'))        
+        if action == 'update':
+            is_update = True
+            selected_role = request.form.get('role')
+            if selected_role:
+                users = get_users_by_role(selected_role)  # Fetch users of the selected role
+        elif action == 'perform_update':
+            username = request.form.get('username')
+            role = request.form.get('new_role') # Get the new role
+            if username and role:
+                update_user(username, role)
+                flash('Role updated successfully!', 'success')
+                return redirect(url_for('assign_role'))
         elif action == 'delete':
-            delete_user(request.form.get('username'))
-    return render_template('assign_role.html', users=users, roles=roles)
+            is_delete = True
+            selected_role = request.form.get('role')
+            if selected_role:
+                users = get_users_by_role(selected_role)  # Fetch users of the selected role
+        elif action == 'perform_delete':
+            username = request.form.get('username')
+            if username:
+                delete_user(username)  # Perform the deletion
+                flash('User deleted successfully!', 'success')
+                return redirect(url_for('assign_role'))
 
-@app.route('/admin5')
+    return render_template('assign_role.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
+
+@app.route('/system_settings')
 def admin5():
-    return render_template('admin5.html')
+    return render_template('system_settings.html')
 
-@app.route('/admin6')
+@app.route('/view_reports')
 def admin6():
-    return render_template('admin6.html')
+    return render_template('view_reports.html')
 
 @app.route('/developer1')
 def developer1():
