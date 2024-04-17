@@ -3,7 +3,7 @@ import psycopg2
 # Function to connect to the PostgreSQL database and return the connection and cursor
 def connect_db():
     conn = psycopg2.connect(
-        dbname="postgres",
+        dbname="mydatabase",
         user="postgres",
         password="admin",
         host="localhost"

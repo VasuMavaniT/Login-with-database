@@ -2,7 +2,7 @@ import psycopg2
 
 # Connect to PostgreSQL server
 conn = psycopg2.connect(
-    dbname="postgres",  # Your database name
+    dbname="mydatabase",  # Your database name
     user="postgres",      # Default superuser
     password="admin",     # Password for the superuser
     host="localhost"      # Host where PostgreSQL is running

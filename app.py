@@ -48,6 +48,7 @@ def close_db(conn, cur):
         conn.close()
 
 def hash_password(password):
+    """Hash a password for storing."""
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
 def authenticate_user(username, password):
@@ -153,6 +154,9 @@ def get_users_by_role(role):
             close_db(conn, cur)
     return []
 
+def verify_password(stored_password, provided_password):
+    return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
+
 
 @app.route('/')
 def home():
@@ -211,19 +215,19 @@ def dashboard():
     else:
         return 'Role not recognized!', 403
 
-@app.route('/manage_profile')
+@app.route('/admin1')
 def admin1():
-    return render_template('manage_profile.html')
+    return render_template('admin1.html')
 
-@app.route('/view_notifications')
+@app.route('/admin2')
 def admin2():
-    return render_template('view_notifications.html')
+    return render_template('admin2.html')
 
-@app.route('/debug_logs')
+@app.route('/admin3')
 def admin3():
-    return render_template('debug_logs.html')
+    return render_template('admin3.html')
 
-@app.route('/manage_users', methods=['GET', 'POST'])
+@app.route('/admin4', methods=['GET', 'POST'])
 def assign_role():
     users = []  # Initialize an empty list for users
     selected_role = None  # Keep track of the selected role for deletion
@@ -261,13 +265,13 @@ def assign_role():
 
     return render_template('assign_role.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
 
-@app.route('/system_settings')
+@app.route('/admin5')
 def admin5():
-    return render_template('system_settings.html')
+    return render_template('admin5.html')
 
-@app.route('/view_reports')
+@app.route('/admin6')
 def admin6():
-    return render_template('view_reports.html')
+    return render_template('admin6.html')
 
 @app.route('/developer1')
 def developer1():
