@@ -225,8 +225,8 @@ def assign_role():
     if request.method == 'POST':
         action = request.form.get('action')
         if action == 'create':
-            create_new_user(request.form.get('username'), request.form.get('password'), request.form.get('role'))        
-        if action == 'update':
+            create_new_user(request.form.get('new-username'), request.form.get('new-password'), request.form.get('new-role'))        
+        elif action == 'update':
             is_update = True
             selected_role = request.form.get('role')
             if selected_role:
@@ -284,6 +284,11 @@ def user2():
 def show_all_users():
     users = get_all_users()
     return render_template('show_all_users.html', users=users)
+    
+@app.route('/view_users')
+def view_users():
+    users = get_all_users()
+    return render_template('view_users.html', users=users)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8097)
