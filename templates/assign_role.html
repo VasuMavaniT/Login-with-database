@@ -13,12 +13,60 @@
     </script>
     <script>
         function submitRoleForm() {
-            document.getElementById('deleteForm').submit();
+            var roleToDelete = document.getElementById('roleToDelete').value;
+            if (roleToDelete === "") {
+                document.getElementById('roleToDeleteError').style.visibility = 'visible';
+            } else {
+                document.getElementById('deleteForm').submit();
+            }
         }
     </script>
     <script>
         function submitRoleUpdateForm() {
-            document.getElementById('updateForm').submit();
+            var roleToUpdate = document.getElementById('roleToUpdate').value;
+            if (roleToUpdate === "") {
+                document.getElementById('roleToUpdateError').style.visibility = 'visible';
+            } 
+            else {
+                document.getElementById('updateForm').submit();
+            }
+        }
+    </script>
+    <script>
+        function validateDeleteForm()
+        {
+            var username = document.getElementById('usernameToDelete').value;
+            if (username === "") {
+                document.getElementById('usernameToDeleteError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            return true;
+        }
+    </script>
+    <script>
+        function validateUpdateForm() {
+            var username = document.getElementById('usernameToUpdate').value;
+            var newRole = document.getElementById('new_role').value;
+            var roleToUpdate = document.getElementById('roleToUpdate').value;
+        
+            // Reset error messages
+            document.getElementById('usernameToUpdateError').style.visibility = 'hidden';
+            document.getElementById('newRoleError').style.visibility = 'hidden';
+        
+            // Check if username and new role are selected
+            if (username === "") {
+                document.getElementById('usernameToUpdateError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            if (newRole === "") {
+                document.getElementById('newRoleError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            if (roleToUpdate === newRole) {
+                document.getElementById('sameNewRoleError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            return true;
         }
     </script>
 </head>
@@ -55,7 +103,7 @@
     </form>
 
     {% if is_update %}
-    <form method="post" style="display:block;">
+    <form method="post" style="display:block;" onsubmit="return validateUpdateForm()">
         <input type="hidden" name="action" value="perform_update">
         <label for="usernameToUpdate">Select User to Update:</label>
         <select name="username" id="usernameToUpdate">
@@ -64,13 +112,16 @@
             <option value="{{ user[0] }}">{{ user[0] }}</option>
             {% endfor %}
         </select>
+        <span id="usernameToUpdateError" style="visibility: hidden; color: red;">Please select a user to update.</span>
         <label for="roleToUpdate">Select New Role:</label>
-        <select name="new_role" id="roleToUpdate">
+        <select name="new_role" id="new_role">
             <option value="">Select Role</option>
             {% for role in roles %}
             <option value="{{ role }}" {% if selected_role == role %} selected {% endif %}>{{ role }}</option>
             {% endfor %}
         </select>
+        <span id="newRoleError" style="visibility: hidden; color: red;">Please select a new role.</span>
+        <span id="sameNewRoleError" style="visibility: hidden; color: red;">New role cannot be the same as the current role.</span>
         <input type="submit" value="Submit">
         <button type="button" onclick="location.href='/assign_role'">Cancel</button>
     </form>
@@ -89,7 +140,7 @@
     </form>
 
     {% if is_delete %}
-    <form method="post" style="display:block;">
+    <form method="post" style="display:block;" onsubmit="return validateDeleteForm()">
         <input type="hidden" name="action" value="perform_delete">
         <label for="usernameToDelete">Select User to Delete:</label>
         <select name="username" id="usernameToDelete">
@@ -98,10 +149,18 @@
             <option value="{{ user[0] }}">{{ user[0] }}</option>
             {% endfor %}
         </select>
+        <span id="usernameToDeleteError" style="visibility: hidden; color: red;">Please select a user to delete.</span>
         <input type="submit" value="Delete">
         <button type="button" onclick="location.href='/assign_role'">Cancel</button>
     </form>
     {% endif %}
+
+    <span id="roleToUpdateError" style="visibility: hidden; color: red;">Please select a role to update.</span>
+    <span id="roleToDeleteError" style="visibility: hidden; color: red;">Please select a role to delete.</span>
+    <span id="usernameToUpdateError" style="visibility: hidden; color: red;">Please select a user to update.</span>
+    <span id="newRoleError" style="visibility: hidden; color: red;">Please select a new role.</span>
+    <span id="successMessage" style="visibility: hidden; color: green;">Form submitted successfully!</span>
+</body>
 
 </body>
 </html>
