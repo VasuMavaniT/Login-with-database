@@ -7,11 +7,30 @@ import secrets
 import bcrypt
 import redis
 import logging
+from insert_data import insert_initial_data
+from flask import Flask, redirect, url_for, session, render_template_string
+from authlib.integrations.flask_client import OAuth
+from urllib.parse import urlencode
+import secrets
+# import time
 
 secret_key = secrets.token_hex(16)
 
 app = Flask(__name__)
 app.secret_key = secret_key
+
+# Configure the OAuth client with Auth0 directly with hardcoded values
+oauth = OAuth(app)
+auth0 = oauth.register(
+    'auth0',
+    client_id='mqk4sNWNd6yyZk9edcLnL2XJYyWcKJ3R',
+    client_secret='Pd9Z6HhgG6RmND6HmTlc__uafXJuo6336131Ib-YO03DX3BvSGxwkQ2lwUcXggp2',
+    api_base_url='https://dev-l75eqemhvyb6yxvl.us.auth0.com',
+    access_token_url='https://dev-l75eqemhvyb6yxvl.us.auth0.com/oauth/token',
+    authorize_url='https://dev-l75eqemhvyb6yxvl.us.auth0.com/authorize',
+    client_kwargs={'scope': 'openid profile email'},
+    jwks_uri='https://dev-l75eqemhvyb6yxvl.us.auth0.com/.well-known/jwks.json',
+)
 
 # Setup Redis
 redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
@@ -32,7 +51,8 @@ def connect_db():
             dbname="postgres",
             user="postgres",
             password="admin",
-            host="localhost"
+            host="localhost",
+            port=5432
         )
         return conn, conn.cursor()
     except psycopg2.Error as e:
@@ -101,7 +121,7 @@ def get_all_users():
         try:
             cur.execute("SELECT username, role FROM usersdata;")
             users = cur.fetchall()
-            redis_client.set('all_users', str(users), ex=120)  # Cache for 1 hour
+            redis_client.set('all_users', str(users), ex=3600)  # Cache for 1 hour
             # logging.info("Fetching from database and setting cache: All Users")
             print("Fetching from database and setting cache: All Users")
             return users
@@ -151,6 +171,28 @@ def get_users_by_role(role):
             close_db(conn, cur)
     return []
 
+
+@app.route('/')
+def home():
+    # Check and insert data if the table is empty
+    conn, cur = connect_db()
+    if conn and cur:
+        try:
+            cur.execute("SELECT COUNT(*) FROM usersdata")
+            if cur.fetchone()[0] == 0:
+                # Run data insertion in the background
+                from threading import Thread
+                thread = Thread(target=insert_initial_data)
+                thread.start()
+        except psycopg2.Error as e:
+            print("Database query failed:", e)
+        finally:
+            close_db(conn, cur)
+
+    # Render the home page
+    return render_template('home.html')
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -162,6 +204,13 @@ def login():
         else:
             flash('Invalid username or password.', 'error')
     return render_template('login.html', form=form)
+
+@app.route('/login_using_sso', methods=['GET', 'POST'])
+def login_using_sso():
+    # Ensure that the callback URL matches exactly what is expected
+    callback_url = url_for('callback', _external=True, _scheme='http')  # Use _scheme if running over HTTP
+    print("Callback URL:", callback_url)  # This will help confirm the right URL is generated
+    return auth0.authorize_redirect(redirect_uri=callback_url)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -187,40 +236,85 @@ def dashboard():
     else:
         return 'Role not recognized!', 403
 
-@app.route('/admin1')
+@app.route('/manage_profile')
 def admin1():
-    return render_template('admin1.html')
+    return render_template('manage_profile.html')
 
-@app.route('/admin2')
+@app.route('/view_notifications')
 def admin2():
-    return render_template('admin2.html')
+    return render_template('view_notifications.html')
 
-@app.route('/admin3')
+@app.route('/debug_logs')
 def admin3():
-    return render_template('admin3.html')
+    return render_template('debug_logs.html')
 
-@app.route('/admin4', methods=['GET', 'POST'])
+@app.route('/manage_users', methods=['GET', 'POST'])
 def assign_role():
-    users = get_all_users()
-    roles = ['admin', 'developer', 'user']
+    users = []  # Initialize an empty list for users
+    selected_role = None  # Keep track of the selected role for deletion
+    roles = ['admin', 'developer', 'user']  # Assuming these are your roles
+    is_delete = False
+    is_update = False
+
     if request.method == 'POST':
         action = request.form.get('action')
-        selected_role = request.form.get('role')
         if action == 'create':
-            create_new_user(request.form.get('username'), request.form.get('password'), request.form.get('role'))
-        elif action == 'update':
-            update_user(request.form.get('username'), request.form.get('role'))
+            create_new_user(request.form.get('username'), request.form.get('password'), request.form.get('role'))        
+        if action == 'update':
+            is_update = True
+            selected_role = request.form.get('role')
+            if selected_role:
+                users = get_users_by_role(selected_role)  # Fetch users of the selected role
+        elif action == 'perform_update':
+            username = request.form.get('username')
+            role = request.form.get('new_role') # Get the new role
+            if username and role:
+                update_user(username, role)
+                flash('Role updated successfully!', 'success')
+                return redirect(url_for('assign_role'))
         elif action == 'delete':
-            delete_user(request.form.get('username'))
-    return render_template('assign_role.html', users=users, roles=roles)
+            is_delete = True
+            selected_role = request.form.get('role')
+            if selected_role:
+                users = get_users_by_role(selected_role)  # Fetch users of the selected role
+        elif action == 'perform_delete':
+            username = request.form.get('username')
+            if username:
+                delete_user(username)  # Perform the deletion
+                flash('User deleted successfully!', 'success')
+                return redirect(url_for('assign_role'))
 
-@app.route('/admin5')
+    return render_template('assign_role.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
+
+# Callback route
+@app.route('/callback')
+def callback():
+    auth0.authorize_access_token()
+    resp = auth0.get('userinfo')
+    userinfo = resp.json()
+    print("User Info:", userinfo)  # Debug: Check what userinfo contains
+    # session['jwt_payload'] = userinfo
+    session['profile'] = {
+        'user_id': userinfo['sub'],
+        'name': userinfo['name'],
+        'picture': userinfo['picture']
+    }
+    # Store the email address in the database
+    email = userinfo['email']
+    password = 'password'  # Example password, should not be hardcoded in production
+    print('email: ', email)
+    create_new_user(email, password, 'user')
+    # Redirect to the dashboard with the correct role
+    return redirect(url_for('dashboard', username=email, role='user'))
+
+
+@app.route('/system_settings')
 def admin5():
-    return render_template('admin5.html')
+    return render_template('system_settings.html')
 
-@app.route('/admin6')
+@app.route('/view_reports')
 def admin6():
-    return render_template('admin6.html')
+    return render_template('view_reports.html')
 
 @app.route('/developer1')
 def developer1():
@@ -241,6 +335,10 @@ def user1():
 @app.route('/user2')
 def user2():
     return render_template('user2.html')
+
+@app.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
 
 @app.route('/show_all_users')
 def show_all_users():
