@@ -161,6 +161,11 @@ def home():
     # Redirect to the login page
     return redirect(url_for('login'))
 
+@app.route('/view_users')
+def view_users():
+    users = get_all_users()
+    return render_template('view_users.html', users=users)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()

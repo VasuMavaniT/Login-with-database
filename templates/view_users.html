@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Users</title>
+</head>
+<body>
+    <h1>View Users</h1>
+    
+    {% if users %}
+    <table border="1">
+        <tr>
+            <th>Username</th>
+            <th>Role</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user[0] }}</td>
+            <td>{{ user[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No user Exists</p>
+    {% endif %}
+
+</body>
+</html>
