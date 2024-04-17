@@ -7,7 +7,6 @@ import secrets
 import bcrypt
 import redis
 import logging
-from insert_data import insert_initial_data
 
 secret_key = secrets.token_hex(16)
 
@@ -157,27 +156,10 @@ def get_users_by_role(role):
 def verify_password(stored_password, provided_password):
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 
-
 @app.route('/')
 def home():
-    # Check and insert data if the table is empty
-    conn, cur = connect_db()
-    if conn and cur:
-        try:
-            cur.execute("SELECT COUNT(*) FROM usersdata")
-            if cur.fetchone()[0] == 0:
-                # Run data insertion in the background
-                from threading import Thread
-                thread = Thread(target=insert_initial_data)
-                thread.start()
-        except psycopg2.Error as e:
-            print("Database query failed:", e)
-        finally:
-            close_db(conn, cur)
-
-    # Render the home page
-    return render_template('home.html')
-
+    # Redirect to the login page
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

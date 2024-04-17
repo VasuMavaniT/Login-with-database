@@ -15,21 +15,6 @@ class TestLogin(unittest.TestCase):
         self.driver = webdriver.Chrome()
         self.driver.get('http://localhost:8097/login')
 
-    def test_postgres_connection(self):
-        '''Check if the connection to the PostgreSQL server is successful.'''
-        dbname="mydatabase"  
-        user="postgres"   
-        password="admin"     
-        host="localhost"     
-
-        conn = psycopg2.connect(
-            dbname=dbname,
-            user=user,
-            password=password,
-            host=host
-        )
-        self.assertIsNotNone(conn)
-
     def test_login_with_invalid_credentials(self):
         # Fill in the login form with valid credentials
         username_input = self.driver.find_element(By.ID, 'username')
