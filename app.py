@@ -202,19 +202,19 @@ def dashboard():
     else:
         return 'Role not recognized!', 403
 
-@app.route('/admin1')
+@app.route('/admin_profile')
 def admin1():
-    return render_template('admin1.html')
+    return render_template('admin_profile.html')
 
-@app.route('/admin2')
+@app.route('/admin_notifications')
 def admin2():
-    return render_template('admin2.html')
+    return render_template('admin_notifications.html')
 
-@app.route('/admin3')
+@app.route('/admin_logs')
 def admin3():
-    return render_template('admin3.html')
+    return render_template('admin_logs.html')
 
-@app.route('/admin4', methods=['GET', 'POST'])
+@app.route('/admin_manage', methods=['GET', 'POST'])
 def assign_role():
     users = []  # Initialize an empty list for users
     selected_role = None  # Keep track of the selected role for deletion
@@ -252,43 +252,38 @@ def assign_role():
 
     return render_template('assign_role.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
 
-@app.route('/admin5')
+@app.route('/admin_settings')
 def admin5():
-    return render_template('admin5.html')
+    return render_template('admin_settings.html')
 
-@app.route('/admin6')
+@app.route('/admin_reports')
 def admin6():
-    return render_template('admin6.html')
+    return render_template('admin_reports.html')
 
-@app.route('/developer1')
+@app.route('/developer_profile')
 def developer1():
-    return render_template('developer1.html')
+    return render_template('developer_profile.html')
 
-@app.route('/developer2')
+@app.route('/developer_notifications')
 def developer2():
-    return render_template('developer2.html')
+    return render_template('developer_notifications.html')
 
-@app.route('/developer3')
+@app.route('/developer_logs')
 def developer3():
-    return render_template('developer3.html')
+    return render_template('developer_logs.html')
 
-@app.route('/user1')
+@app.route('/user_profile')
 def user1():
-    return render_template('user1.html')
+    return render_template('user_profile.html')
 
-@app.route('/user2')
+@app.route('/user_notifications')
 def user2():
-    return render_template('user2.html')
+    return render_template('user_notifications.html')
 
 @app.route('/show_all_users')
 def show_all_users():
     users = get_all_users()
     return render_template('show_all_users.html', users=users)
     
-@app.route('/view_users')
-def view_users():
-    users = get_all_users()
-    return render_template('view_users.html', users=users)
-
 if __name__ == '__main__':
     app.run(debug=True, port=8097)
