@@ -12,10 +12,10 @@ class TestUserManagement(unittest.TestCase):
     def setUp(self):
         # Set up database connection
         self.conn = psycopg2.connect(
-            dbname="postgres",
+            dbname="mydatabase",
             user="postgres",
-            password="admin",
-            host="localhost",
+            password="postgres",
+            host="db",
             port=5432
         )
         self.cur = self.conn.cursor()
