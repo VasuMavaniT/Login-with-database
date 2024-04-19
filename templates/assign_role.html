@@ -3,6 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Assign Roles</title>
+    <style>
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1000px; /* Adjust as needed */
+            margin: 0 auto;
+            padding: 20px;
+            flex-wrap: wrap; /* Allow items to wrap to the next row */
+        }
+    
+        .dashboard-item {
+            width: calc(25% - 20px); /* Adjust for spacing */
+            margin-bottom: 20px; /* Adjust spacing between rows */
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-sizing: border-box;
+            height: 300px; /* Set a fixed height for all items */
+            display: flex; /* Add this line to align items vertically */
+            flex-direction: column; /* Add this line to align items vertically */
+            justify-content: space-between; /* Add this line to align items vertically */
+        }
+    
+        .dashboard-item img {
+            display: block;
+            max-width: 100%;
+            height: 80%; /* Set the image height to 80% of the container */
+            margin-bottom: 10px;
+            object-fit: cover; /* Ensure images cover the entire container */
+        }
+    
+        .dashboard-item span {
+            text-align: center; /* Center align the text */
+        }
+    </style>
+    
     <script>
         function showForm(formId) {
             document.getElementById('createForm').style.display = 'none';
@@ -93,10 +129,32 @@
 <body>
     <h1 class="page-title">User Management</h1>
     
-    <button id="create-new-user" onclick="showForm('createForm')">Create New User</button>
+    <!-- <button id="create-new-user" onclick="showForm('createForm')">Create New User</button>
     <button id="update-user" onclick="showForm('updateForm')">Update User</button>
     <button id='delete-user' onclick="showForm('deleteForm')">Delete User</button>
-    <button id='view-user' onclick="location.href='/view_users'">View Users</button>
+    <button id='view-user' onclick="location.href='/view_users'">View Users</button> -->
+    <div class = "dashboard">
+        <div class="dashboard-item create-new-user" onclick="showForm('createForm')" style="cursor: pointer;">
+            <img src="{{ url_for('static', filename='create-user.png') }}" id="create-new-user">
+            <span>Create New User</span>
+        </div>
+        
+        <div class="dashboard-item update-user" onclick="showForm('updateForm')" style="cursor: pointer;">
+            <img src="{{ url_for('static', filename='update-user.png') }}" id="update-user">
+            <span>Update User</span>
+        </div>
+        
+        <div class="dashboard-item delete-user" onclick="showForm('deleteForm')" style="cursor: pointer;">
+            <img src="{{ url_for('static', filename='delete-user.png') }}" id="delete-user">
+            <span>Delete User</span>
+        </div>
+        
+        <div class="dashboard-item view-user" onclick="location.href='/view_users'" style="cursor: pointer;">
+            <img src="{{ url_for('static', filename='view-users.png') }}" id="view-user">
+            <span>View Users</span>
+        </div>
+    </div>
+    
     
     <form id="createForm" style="display:none" method="post" onsubmit="return validateCreateForm()">
         <input type="hidden" name="action" value="create">

@@ -14,7 +14,7 @@ class TestLogin(unittest.TestCase):
     def setUp(self):
         # Replace 'chromedriver' with the path to your WebDriver executable
         self.driver = webdriver.Chrome()
-        self.driver.get('http://localhost:8097/login')
+        self.driver.get('http://localhost:8097/admin_manage')
 
         username_input_login = self.driver.find_element(By.ID, 'username')
         password_input_login = self.driver.find_element(By.ID, 'password')
@@ -37,7 +37,7 @@ class TestLogin(unittest.TestCase):
 
     def test_create_new_user_without_username(self):
         # Click the button to show the create new user form
-        new_user_button = self.driver.find_element(By.ID, 'create-new-user')
+        new_user_button = self.driver.find_element(By.CLASS_NAME, 'create-new-user')
         new_user_button.click()
 
         # Wait for the form elements to become visible
@@ -63,7 +63,7 @@ class TestLogin(unittest.TestCase):
 
     def test_create_new_user_without_password(self):
     # Click the button to show the create new user form
-        new_user_button = self.driver.find_element(By.ID, 'create-new-user')
+        new_user_button = self.driver.find_element(By.CLASS_NAME, 'create-new-user')
         new_user_button.click()
 
         # Wait for the form elements to become visible
@@ -92,7 +92,7 @@ class TestLogin(unittest.TestCase):
         self.assertTrue('Please enter a password.' in error_message.text)
 
     def test_update_new_user_without_type(self):
-        update_user_button = self.driver.find_element(By.ID, 'update-user')
+        update_user_button = self.driver.find_element(By.CLASS_NAME, 'update-user')
         update_user_button.click()
 
         WebDriverWait(self.driver, 10).until(
@@ -110,7 +110,7 @@ class TestLogin(unittest.TestCase):
         self.assertTrue('Please select a role to update.' in error_message.text)
 
     def test_update_new_user_without_username(self):
-        update_user_button = self.driver.find_element(By.ID, 'update-user')
+        update_user_button = self.driver.find_element(By.CLASS_NAME, 'update-user')
         update_user_button.click()
 
         WebDriverWait(self.driver, 10).until(
@@ -142,7 +142,7 @@ class TestLogin(unittest.TestCase):
         self.assertTrue('Please select a user to update.' in error_message.text)
 
     def test_update_new_user_without_new_role(self):
-        update_user_button = self.driver.find_element(By.ID, 'update-user')
+        update_user_button = self.driver.find_element(By.CLASS_NAME, 'update-user')
         update_user_button.click()
 
         WebDriverWait(self.driver, 10).until(
@@ -180,7 +180,7 @@ class TestLogin(unittest.TestCase):
         self.assertTrue('Please select a new role.' in error_message.text)
 
     def test_delete_user_without_role(self):
-        delete_user_button = self.driver.find_element(By.ID, 'delete-user')
+        delete_user_button = self.driver.find_element(By.CLASS_NAME, 'delete-user')
         delete_user_button.click()
 
         WebDriverWait(self.driver, 10).until(
@@ -202,7 +202,7 @@ class TestLogin(unittest.TestCase):
         self.assertTrue('Please select a role to delete.' in error_message.text)
 
     def test_delete_without_username(self):
-        delete_user_button = self.driver.find_element(By.ID, 'delete-user')
+        delete_user_button = self.driver.find_element(By.CLASS_NAME, 'delete-user')
         delete_user_button.click()
 
         WebDriverWait(self.driver, 10).until(
