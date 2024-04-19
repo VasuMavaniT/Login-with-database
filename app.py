@@ -9,7 +9,6 @@ import redis
 import logging
 from insert_data_final import insert_initial_data
 from authlib.integrations.flask_client import OAuth
-from urllib.parse import urlencode
 
 secret_key = secrets.token_hex(16)
 

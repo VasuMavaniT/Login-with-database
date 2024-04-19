@@ -7,3 +7,5 @@ flask_sqlalchemy
 psycopg2-binary
 bcrypt
 redis
+authlib
+requests

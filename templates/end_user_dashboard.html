@@ -10,19 +10,27 @@
 
         .dashboard {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             max-width: 600px; /* Adjust as needed */
             margin: 0 auto;
             padding: 20px;
+            box-sizing: border-box; /* Include padding in width calculation */
         }
 
         .dashboard-item {
-            width: calc(50% - 20px); /* Adjust for spacing */
+            width: calc(33.33% - 20px); /* Adjust for spacing */
             margin-bottom: 20px; /* Adjust spacing between rows */
             background-color: #f0f0f0;
             border: 1px solid #ccc;
             padding: 20px;
             box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add box shadow for better visual */
+            transition: transform 0.3s ease; /* Optional: Add smooth hover effect */
+        }
+
+        .dashboard-item:hover {
+            transform: translateY(-5px); /* Optional: Move item up slightly on hover */
         }
 
         .dashboard-item img {
@@ -30,6 +38,11 @@
             max-width: 100%;
             height: auto;
             margin-bottom: 10px;
+        }
+
+        .center {
+            display: flex;
+            justify-content: center;
         }
     </style>
 </head>
@@ -46,6 +59,12 @@
             <a href="/user_notifications">
                 <img src="{{ url_for('static', filename='notification.png') }}" alt="Example Image">
                 View Notifications
+            </a>
+        </div>
+        <div class="dashboard-item documentation">
+            <a href="/documentation">
+                <img src="{{ url_for('static', filename='documentation.png') }}" alt="Example Image">
+                Documentation
             </a>
         </div>
     </div>
