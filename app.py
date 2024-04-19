@@ -212,7 +212,7 @@ def login():
 @app.route('/login_using_sso', methods=['GET', 'POST'])
 def login_using_sso():
     # Ensure that the callback URL matches exactly what is expected
-    callback_url = url_for('callback', _external=True, _scheme='http')  # Use _scheme if running over HTTP
+    callback_url = url_for('callback', _external=True, _scheme='https')  # Use _scheme if running over HTTP
     print("Callback URL:", callback_url)  # This will help confirm the right URL is generated
     return auth0.authorize_redirect(redirect_uri=callback_url)
 

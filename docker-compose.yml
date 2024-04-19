@@ -35,15 +35,15 @@ services:
     networks:
       - sample_network  # Add service to the custom network
 
-  app2:
-    build: .
-    depends_on:
-      - db
-      - redis
-    ports:
-      - "8098:8097"
-    networks:
-      - sample_network  # Add service to the custom network
+  # app2:
+  #   build: .
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   ports:
+  #     - "8098:8097"
+  #   networks:
+  #     - sample_network  # Add service to the custom network
 
 networks:
   sample_network:  # Define custom network

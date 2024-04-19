@@ -28,19 +28,19 @@ role_counters = {
 def insert_initial_data():
     # Connect to PostgreSQL server
     conn = psycopg2.connect(
-        dbname="postgres",
+        dbname="mydatabase",
         user="postgres",
-        password="admin",
-        host="localhost",
+        password="postgres",
+        host="db",
         port=5432
     )
     conn.autocommit = True
     cur = conn.cursor()
 
     # Insert 100 random records into the table
-    # for i in range(100):
-    #     username, hashed_password, role = generate_random_data(role_counters)
-    #     cur.execute("INSERT INTO usersdata (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
+    for i in range(100):
+        username, hashed_password, role = generate_random_data(role_counters)
+        cur.execute("INSERT INTO usersdata (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
 
     # Close cursor and connection
     cur.close()
