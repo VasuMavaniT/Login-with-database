@@ -3,6 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Assign Roles</title>
+    <style>
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1000px; /* Adjust as needed */
+            margin: 0 auto;
+            padding: 20px;
+            flex-wrap: wrap; /* Allow items to wrap to the next row */
+        }
+    
+        .dashboard-item {
+            width: calc(25% - 20px); /* Adjust for spacing */
+            margin-bottom: 20px; /* Adjust spacing between rows */
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-sizing: border-box;
+            height: 300px; /* Set a fixed height for all items */
+            display: flex; /* Add this line to align items vertically */
+            flex-direction: column; /* Add this line to align items vertically */
+            justify-content: space-between; /* Add this line to align items vertically */
+        }
+    
+        .dashboard-item img {
+            display: block;
+            max-width: 100%;
+            height: 80%; /* Set the image height to 80% of the container */
+            margin-bottom: 10px;
+            object-fit: cover; /* Ensure images cover the entire container */
+        }
+    
+        .dashboard-item span {
+            text-align: center; /* Center align the text */
+        }
+    </style>
+    
     <script>
         function showForm(formId) {
             document.getElementById('createForm').style.display = 'none';
@@ -12,33 +48,127 @@
         }
     </script>
     <script>
+        function validateCreateForm() {
+            var username = document.getElementById('new-username').value;
+            var password = document.getElementById('new-password').value;
+            document.getElementById('newusernameError').style.visibility = 'hidden';
+            document.getElementById('newpasswordError').style.visibility = 'hidden';
+            if (username === "") {
+                document.getElementById('newusernameError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            else if (password == "") {
+                document.getElementById('newpasswordError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            document.getElementById('create-success').style.visibility = 'visible';
+            return true;
+        }
+    </script>
+    <script>
         function submitRoleForm() {
-            document.getElementById('deleteForm').submit();
+            var roleToDelete = document.getElementById('roleToDelete').value;
+            if (roleToDelete === "") {
+                document.getElementById('roleToDeleteError').style.visibility = 'visible';
+            } else {
+                document.getElementById('deleteForm').submit();
+            }
         }
     </script>
     <script>
         function submitRoleUpdateForm() {
-            document.getElementById('updateForm').submit();
+            var roleToUpdate = document.getElementById('roleToUpdate').value;
+            if (roleToUpdate === "") {
+                document.getElementById('roleToUpdateError').style.visibility = 'visible';
+            } 
+            else {
+                document.getElementById('updateForm').submit();
+            }
+        }
+    </script>
+    <script>
+        function validateDeleteForm()
+        {
+            var username = document.getElementById('usernameToDelete').value;
+            if (username === "") {
+                document.getElementById('usernameToDeleteError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            document.getElementById('delete-success').style.visibility = 'visible';
+            return true;
+        }
+    </script>
+    <script>
+        function validateUpdateForm() {
+            var username = document.getElementById('usernameToUpdate').value;
+            var newRole = document.getElementById('update_new_role').value;
+            var roleToUpdate = document.getElementById('roleToUpdate').value;
+        
+            // Reset error messages
+            document.getElementById('usernameToUpdateError').style.visibility = 'hidden';
+            document.getElementById('newRoleError').style.visibility = 'hidden';
+        
+            // Check if username and new role are selected
+            if (username === "") {
+                document.getElementById('usernameToUpdateError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            if (newRole === "") {
+                document.getElementById('newRoleError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            if (roleToUpdate === newRole) {
+                document.getElementById('sameNewRoleError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            document.getElementById('update-success').style.visibility = 'visible';
+            return true;
         }
     </script>
 </head>
 <body>
-    <h1>Assign Roles to Users</h1>
+    <h1 class="page-title">User Management</h1>
     
-    <button onclick="showForm('createForm')">Create New User</button>
-    <button onclick="showForm('updateForm')">Update User</button>
-    <button onclick="showForm('deleteForm')">Delete User</button>
+    <!-- <button id="create-new-user" onclick="showForm('createForm')">Create New User</button>
+    <button id="update-user" onclick="showForm('updateForm')">Update User</button>
+    <button id='delete-user' onclick="showForm('deleteForm')">Delete User</button>
+    <button id='view-user' onclick="location.href='/view_users'">View Users</button> -->
+    <div class = "dashboard">
+        <div class="dashboard-item create-new-user" onclick="showForm('createForm')" style="cursor: pointer;">
+            <img src="{{ url_for('static', filename='create-user.png') }}" id="create-new-user">
+            <span>Create New User</span>
+        </div>
+        
+        <div class="dashboard-item update-user" onclick="showForm('updateForm')" style="cursor: pointer;">
+            <img src="{{ url_for('static', filename='update-user.png') }}" id="update-user">
+            <span>Update User</span>
+        </div>
+        
+        <div class="dashboard-item delete-user" onclick="showForm('deleteForm')" style="cursor: pointer;">
+            <img src="{{ url_for('static', filename='delete-user.png') }}" id="delete-user">
+            <span>Delete User</span>
+        </div>
+        
+        <div class="dashboard-item view-user" onclick="location.href='/view_users'" style="cursor: pointer;">
+            <img src="{{ url_for('static', filename='view-users.png') }}" id="view-user">
+            <span>View Users</span>
+        </div>
+    </div>
     
-    <form id="createForm" style="display:none" method="post">
+    
+    <form id="createForm" style="display:none" method="post" onsubmit="return validateCreateForm()">
         <input type="hidden" name="action" value="create">
-        Username: <input type="text" name="username" required><br>
-        Password: <input type="password" name="password" required><br>
-        Role: <select name="role">
+        Username: <input type="text" name="new-username" id="new-username">
+        <span id="newusernameError" style="visibility: hidden; color: red;">Please enter a username.</span><br>
+        Password: <input type="password" name="new-password" id="new-password">
+        <span id="newpasswordError" style="visibility: hidden; color: red;">Please enter a password.</span><br>
+        Role: <select name="new-role" id="new-role">
+                <option value="user">Other User</option>
                 <option value="admin">Admin</option>
                 <option value="developer">Developer</option>
-                <option value="user">Other User</option>
               </select><br>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Submit" id="new-submit">
+        <span id="create-success" style="visibility: hidden; color: green;">New user is created!</span>
     </form>
 
     <form id="updateForm" style="display:none;" method="post">
@@ -50,11 +180,11 @@
             <option value="{{ role }}" {% if selected_role == role %} selected {% endif %}>{{ role }}</option>
             {% endfor %}
         </select>
-        <button type="button" onclick="submitRoleUpdateForm()">Select Role</button>
+        <button type="button" onclick="submitRoleUpdateForm()" id="update-role-selection">Select Role</button>
     </form>
 
     {% if is_update %}
-    <form method="post" style="display:block;">
+    <form method="post" style="display:block;" onsubmit="return validateUpdateForm()">
         <input type="hidden" name="action" value="perform_update">
         <label for="usernameToUpdate">Select User to Update:</label>
         <select name="username" id="usernameToUpdate">
@@ -63,14 +193,18 @@
             <option value="{{ user[0] }}">{{ user[0] }}</option>
             {% endfor %}
         </select>
+        <span id="usernameToUpdateError" style="visibility: hidden; color: red;">Please select a user to update.</span>
         <label for="roleToUpdate">Select New Role:</label>
-        <select name="new_role" id="roleToUpdate">
+        <select name="new_role" id="update_new_role">
             <option value="">Select Role</option>
             {% for role in roles %}
             <option value="{{ role }}" {% if selected_role == role %} selected {% endif %}>{{ role }}</option>
             {% endfor %}
         </select>
-        <input type="submit" value="Submit">
+        <span id="newRoleError" style="visibility: hidden; color: red;">Please select a new role.</span>
+        <span id="sameNewRoleError" style="visibility: hidden; color: red;">New role cannot be the same as the current role.</span>
+        <span id="update-success" style="visibility: hidden; color: green;">User role is updated!</span>
+        <input type="submit" value="Submit" id="update-submit">
         <button type="button" onclick="location.href='/assign_role'">Cancel</button>
     </form>
     {% endif %}
@@ -84,11 +218,11 @@
             <option value="{{ role }}" {% if selected_role == role %} selected {% endif %}>{{ role }}</option>
             {% endfor %}
         </select>
-        <button type="button" onclick="submitRoleForm()">Select Role</button>
+        <button type="button" id="delete-role" onclick="submitRoleForm()">Select Role</button>
     </form>
 
     {% if is_delete %}
-    <form method="post" style="display:block;">
+    <form method="post" style="display:block;" onsubmit="return validateDeleteForm()">
         <input type="hidden" name="action" value="perform_delete">
         <label for="usernameToDelete">Select User to Delete:</label>
         <select name="username" id="usernameToDelete">
@@ -97,12 +231,19 @@
             <option value="{{ user[0] }}">{{ user[0] }}</option>
             {% endfor %}
         </select>
-        <input type="submit" value="Delete">
+        <span id="usernameToDeleteError" style="visibility: hidden; color: red;">Please select a user to delete.</span>
+        <span id="delete-success" style="visibility: hidden; color: green;">User is deleted!</span>
+        <input type="submit" value="Delete" id="delete-submit">
         <button type="button" onclick="location.href='/assign_role'">Cancel</button>
     </form>
     {% endif %}
 
-    
+    <span id="roleToUpdateError" style="visibility: hidden; color: red;">Please select a role to update.</span>
+    <span id="roleToDeleteError" style="visibility: hidden; color: red;">Please select a role to delete.</span>
+    <span id="usernameToUpdateError" style="visibility: hidden; color: red;">Please select a user to update.</span>
+    <span id="newRoleError" style="visibility: hidden; color: red;">Please select a new role.</span>
+    <span id="successMessage" style="visibility: hidden; color: green;">Form submitted successfully!</span>
+</body>
 
 </body>
 </html>

@@ -3,43 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            max-width: 600px; /* Adjust as needed */
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard-item {
+            width: calc(33.33% - 20px); /* Adjust for spacing */
+            margin-bottom: 20px; /* Adjust spacing between rows */
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .dashboard-item img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome, Admin!</h1>
-    <div>
-        <h2>Dashboard</h2>
-        <ul>
-            <li>
-                <a href="/manage_profile">Profile Management
-                    <img src="{{ url_for('static', filename='profile.png') }}" alt="Example Image" />
-                </a>
-            </li>
-            <li>
-                <a href="/view_notifications">View Notifications
-                    <img src="{{ url_for('static', filename='notification.png') }}" alt="Example Image" />
-                </a>
-            </li>
-            <li>
-                <a href="/debug_logs">Debug Logs
-                    <img src="{{ url_for('static', filename='debug.jpg') }}" alt="Example Image" />
-                </a>
-            </li>
-            <li>
-                <a href="/manage_users">Manage Users
-                    <img src="{{ url_for('static', filename='user.png') }}" alt="Example Image" />
-                </a>
-            </li>
-            <li>
-                <a href="/system_settings">System Settings
-                    <img src="{{ url_for('static', filename='system.jpg') }}" alt="Example Image" />
-                </a>
-            </li>
-            <li>
-                <a href="/view_reports">View Reports
-                    <img src="{{ url_for('static', filename='report.jpg') }}" alt="Example Image" />
-                </a>
-            </li>
-        </ul>
+    <h1 class="welcome-message">Welcome, Admin!</h1>  
+    <div class="dashboard">
+        <div class="dashboard-item profile-management">
+            <a href="/admin_profile">
+                <img src="{{ url_for('static', filename='profile.png') }}" alt="Example Image">
+                Profile Management
+            </a>
+        </div>
+        <div class="dashboard-item view-notifications">
+            <a href="/admin_notifications">
+                <img src="{{ url_for('static', filename='notification.png') }}" alt="Example Image">
+                View Notifications
+            </a>
+        </div>
+        <div class="dashboard-item debug-logs">
+            <a href="/admin_logs">
+                <img src="{{ url_for('static', filename='debug.jpg') }}" alt="Example Image">
+                Debug Logs
+            </a>
+        </div>
+        <div class="dashboard-item manage-users">
+            <a href="/admin_manage">
+                <img src="{{ url_for('static', filename='user.png') }}" alt="Example Image">
+                Manage Users
+            </a>
+        </div>
+        <div class="dashboard-item system-settings">
+            <a href="/admin_settings">
+                <img src="{{ url_for('static', filename='system.jpg') }}" alt="Example Image">
+                System Settings
+            </a>
+        </div>
+        <div class="dashboard-item view-reports">
+            <a href="/admin_reports">
+                <img src="{{ url_for('static', filename='report.jpg') }}" alt="Example Image">
+                View Reports
+            </a>
+        </div>
+        <div class="dashboard-item documentation">
+            <a href="/documentation">
+                <img src="{{ url_for('static', filename='documentation.png') }}" alt="Example Image">
+                Documentation
+            </a>
+        </div>
     </div>
 </body>
 </html>

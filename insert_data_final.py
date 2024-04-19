@@ -10,9 +10,6 @@ def generate_random_data(role_counters):
     roles = ['admin', 'developer', 'user']  # List of roles
     role = random.choice(roles)  # Randomly select a role
     num = role_counters[role]  # Get the current counter value for the selected role
-
-    if num == 0:
-        num = ''
     
     username = f"{role}{num}"
     password = username  # For simplicity, making password same as username
@@ -23,27 +20,29 @@ def generate_random_data(role_counters):
 
 # Initialize counters for each role
 role_counters = {
-    'admin': 0,
-    'developer': 0,
-    'user': 0
+    'admin': 1,
+    'developer': 1,
+    'user': 1
 }
 
-# Connect to PostgreSQL server
-conn = psycopg2.connect(
-    dbname="mydatabase",  # Your database name
-    user="postgres",      # Default superuser
-    password="admin",     # Password for the superuser
-    host="localhost"      # Host where PostgreSQL is running
-)
-conn.autocommit = True
-cur = conn.cursor()
+def insert_initial_data():
+    # Connect to PostgreSQL server
+    conn = psycopg2.connect(
+        dbname="postgres",
+        user="postgres",
+        password="admin",
+        host="localhost",
+        port=5432
+    )
+    conn.autocommit = True
+    cur = conn.cursor()
 
-# Insert 100 random records into the table
-for i in range(100):
-    username, hashed_password, role = generate_random_data(role_counters)
-    cur.execute("INSERT INTO usersdata (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
+    # Insert 100 random records into the table
+    # for i in range(100):
+    #     username, hashed_password, role = generate_random_data(role_counters)
+    #     cur.execute("INSERT INTO usersdata (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
 
-# Close cursor and connection
-cur.close()
-conn.close()
-print("Table 'usersdata' updated successfully with 100 random records inserted.")
+    # Close cursor and connection
+    cur.close()
+    conn.close()
+    print("Table 'usersdata' updated successfully with 100 random records inserted.")
