@@ -212,14 +212,16 @@ def view_users():
 def login():
     '''This function is used to login using a username and password.'''
     form = LoginForm()
+    login_success = True
     if form.validate_on_submit():
         user = authenticate_user(form.username.data, form.password.data)
         if user:
             flash('Login successful!', 'success')
             return redirect(url_for('dashboard', username=user[0], role=user[1]))
         else:
+            login_success = False
             flash('Invalid username or password.', 'error')
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, login_success=login_success)
 
 @app.route('/login_using_sso', methods=['GET', 'POST'])
 def login_using_sso():
