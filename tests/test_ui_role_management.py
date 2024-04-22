@@ -179,62 +179,24 @@ class TestLogin(unittest.TestCase):
         error_message = self.driver.find_element(By.ID, 'newRoleError')
         self.assertTrue('Please select a new role.' in error_message.text)
 
-    def test_delete_user_without_role(self):
+    def test_delete_user_without_selecting_user(self):
         delete_user_button = self.driver.find_element(By.CLASS_NAME, 'delete-user')
         delete_user_button.click()
 
         WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, 'roleToDelete'))
+            EC.visibility_of_element_located((By.ID, 'submit-delete'))
         )
 
-        select_delete_role_id = 'roleToDelete'
-        new_role_selection = Select(self.driver.find_element(By.ID, select_delete_role_id))
-        new_role_selection.select_by_visible_text('Select Role')
-
-        delete_role_selection_button = self.driver.find_element(By.ID, 'delete-role')
+        delete_role_selection_button = self.driver.find_element(By.ID, "submit-delete")
         delete_role_selection_button.click()
 
         WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, 'roleToDeleteError'))
+            EC.visibility_of_element_located((By.ID, 'delete-user-error'))
         )
 
-        error_message = self.driver.find_element(By.ID, 'roleToDeleteError')
-        self.assertTrue('Please select a role to delete.' in error_message.text)
+        error_message = self.driver.find_element(By.ID, 'delete-user-error')
+        self.assertTrue('Please select at least one user to delete.' in error_message.text)
 
-    def test_delete_without_username(self):
-        delete_user_button = self.driver.find_element(By.CLASS_NAME, 'delete-user')
-        delete_user_button.click()
-
-        WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, 'roleToDelete'))
-        )
-
-        select_delete_role_id = 'roleToDelete'
-        new_role_selection = Select(self.driver.find_element(By.ID, select_delete_role_id))
-        new_role_selection.select_by_visible_text('user')
-
-        delete_role_selection_button = self.driver.find_element(By.ID, 'delete-role')
-        delete_role_selection_button.click()
-
-
-        WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, 'usernameToDelete'))
-        )
-
-        select_user_id = 'usernameToDelete'
-        user_selection = Select(self.driver.find_element(By.ID, select_user_id))
-        user_selection.select_by_visible_text('Select User')
-
-        delete_button = self.driver.find_element(By.ID, 'delete-submit')
-        delete_button.click()
-        # usernameToDeleteError
-
-        WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, 'usernameToDeleteError'))
-        )
-
-        error_message = self.driver.find_element(By.ID, 'usernameToDeleteError')
-        self.assertTrue('Please select a user to delete.' in error_message.text)
 
     def tearDown(self):
         self.driver.quit()

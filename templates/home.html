@@ -2,10 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Welcome !</title>
+    <title>Welcome!</title>
+    <style>
+        body, html {
+            margin: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #013369; /* Dark blue background for the whole page */
+            color: #FF8C00; /* Orange text color */
+            background-image: url('C:\\Users\\rishabh\\Documents\\new_login\\Login-with-database\\static\\19852069_6205248.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            width: 60%;
+            max-width: 500px; /* Adjust width as needed */
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-color: rgba(2, 78, 124, 0.85); /* Slightly transparent background */
+        }        
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        p a {
+            display: inline-block;
+            background-color: #FF8C00; /* Orange background for the button */
+            color: #013369; /* Dark blue text */
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 18px;
+            border-radius: 10px; /* Rounded edges for the button */
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        p a:hover {
+            background-color: #ffc042; /* Lighter orange on hover */
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome!</h1>
-    <p><a href="/login">Login</a></p>
+    <div class="container">
+        <h1>Welcome!</h1>
+        <p><a href="/login">Login</a></p>
+    </div>
 </body>
 </html>

@@ -108,6 +108,7 @@
     <ul>
         <li><a href="#introduction">Introduction</a></li>
         <li><a href="#getting-started">Getting Started</a></li>
+        <li><a href="#deployment">Deployment</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#caching">Caching</a></li>
         <li><a href="#database-management">Database Management</a></li>
@@ -116,6 +117,11 @@
         <li><a href="#advanced-features">Advanced Features</a></li>
         <li><a href="#security">Security</a></li>
         <li><a href="#troubleshooting">Troubleshooting</a></li>
+        <li><a href="#functional-requirements">Funtional Requirements</a></li>
+        <li><a href="#non-functional-requirements">Non Funtional Requirements</a></li>
+        <li><a href="#feasibility-study">Feasibility Study</a></li>
+        <li><a href="#project-plan">Project Plan</a></li>
+        <li><a href="#system-analysis">System Analysis</a></li>
         <li><a href="#appendix">Appendix</a></li>
     </ul>
 </div>
@@ -141,7 +147,7 @@
         <p>The system implements role-based access control (RBAC), defining distinct capabilities for different user types: users, developers, and administrators. With Redis caching, the system efficiently manages data retrieval, significantly reducing response times and minimizing direct database queries.</p>
         <p>This document aims to guide you through the setup, features, and administration of the Login System, ensuring you can effectively utilize and manage it according to your needs.</p>
     </div>
-
+    
     <div id="getting-started">
         <div class="anchor" id="getting-started"></div>
         <h2>Getting Started</h2>
@@ -193,6 +199,71 @@
             <li>Start your Flask application to verify it runs correctly: <pre><code>flask run</code></pre></li>
         </ul>
     </div>
+    
+    <div id="deployment">
+        <div class="anchor" id="deployment"></div>
+        <h2>Deployment</h2>
+        <p>This section provides detailed instructions on deploying the application components using Docker Compose. Ensure Docker and Docker Compose are installed on your system before proceeding.</p>
+        <h3>Docker Compose Configuration</h3>
+        <p>Below is the docker-compose.yml configuration for setting up the services:</p>
+        <pre><code>version: '3.7'
+    services:
+      db:
+        image: postgres
+        restart: unless-stopped
+        container_name: db
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mydatabase
+        ports:
+          - '9432:5432'
+        volumes:
+          - ./backup.sql:/docker-entrypoint-initdb.d/backup.sql
+        networks:
+          - sample_network
+        
+      redis:
+        image: redis
+        restart: unless-stopped
+        container_name: redis
+        ports:
+          - "6479:6379"
+        networks:
+          - sample_network
+    
+      app1:
+        build: .
+        depends_on:
+          - db
+          - redis
+        environment:
+          FLASK_RUN_PORT: 8097
+        ports:
+          - "8097:8097"
+        networks:
+          - sample_network
+    
+      app2:
+        build: .
+        depends_on:
+          - db
+          - redis
+        environment:
+          FLASK_RUN_PORT: 8098
+        ports:
+          - "8098:8097"
+        networks:
+          - sample_network
+    
+    networks:
+      sample_network:
+        driver: bridge
+        </code></pre>
+        <h3>Network Configuration</h3>
+        <p>The <code>sample_network</code> custom network ensures that all services can communicate securely. This network uses the bridge driver, providing isolated networking for the containers involved.</p>
+    </div>
+    
     
     
 
@@ -324,7 +395,6 @@
         <h3>Load Balancing</h3>
         <ul>
             <li><strong>Overview:</strong> Utilization of load balancing techniques to distribute incoming traffic across multiple servers, thus enhancing the application's ability to handle large volumes of requests smoothly.</li>
-            <li><strong>Implementation with Azure:</strong> Steps to configure Azure Load Balancers to manage the traffic effectively, ensuring optimal performance and uptime.</li>
         </ul>
     </div>
     
@@ -365,26 +435,162 @@
         <h3>Contacting Support</h3>
         <p>For unresolved issues, please contact our technical support team with a detailed description of the problem, including logs, error
     
-            <div id="appendix">
-                <div class="anchor" id="appendix"></div>
-                <h2>Appendix</h2>
-                <p>The Appendix section of our documentation provides additional information that supports and enhances the understanding of our login system. This includes a glossary of terms and a list of further resources for more in-depth information.</p>
-                <h3>Glossary</h3>
-                <ul>
-                    <li><strong>SSO (Single Sign-On):</strong> A session/user authentication process that allows a user to enter one name and password in order to access multiple applications.</li>
-                    <li><strong>bcrypt:</strong> A password hashing function designed for securing passwords.</li>
-                    <li><strong>RBAC (Role-Based Access Control):</strong> A method of restricting system access to authorized users based on their roles.</li>
-                    <li><strong>Redis:</strong> An open-source, in-memory data structure store, used as a database, cache, and message broker.</li>
-                    <li><strong>PostgreSQL:</strong> An open-source relational database management system emphasizing extensibility and SQL compliance.</li>
-                    <li><strong>NGINX:</strong> A web server which can also be used as a reverse proxy, load balancer, and HTTP cache.</li>
-                </ul>
-                <h3>Additional Resources</h3>
-                <ul>
-                    <li><a href="https://flask.palletsprojects.com/">Flask Documentation</a>: The official Flask documentation provides extensive guides and tutorials on how to use Flask for web development.</li>
-                    <li><a href="https://www.postgresql.org/docs/">PostgreSQL Tutorials</a>: Detailed documentation and learning resources for PostgreSQL.</li>
-                    <li><a href="https://redis.io/documentation">Redis Documentation</a>: Comprehensive resource for learning about Redis capabilities and functionalities.</li>
-                </ul>
-            </div>
+    <div id="functional-requirements">
+        <div class="anchor" id="functional-requirements"></div>
+        <h2>Functional Requirements</h2>
+        <p>This section details the core functionalities provided by the Flask login application, ensuring users can interact with the system as intended.</p>
+        <ul>
+            <li><strong>User Authentication:</strong> System must allow users to log in using their username and password. The login process should validate users' credentials against the database.</li>
+            <li><strong>Session Management:</strong> Upon successful login, the system should create a session for the user to maintain login state across pages.</li>
+            <li><strong>User Registration:</strong> New users should be able to register by providing required details. The system must check for existing usernames and deny duplicates.</li>
+            <li><strong>Password Management:</strong> Provide mechanisms for password recovery and resetting in case users forget their passwords.</li>
+            <li><strong>SSO Integration:</strong> Support login through Single Sign-On (SSO) services like Google and Microsoft.</li>
+            <li><strong>Role-Based Access Control:</strong> Users should access different parts of the system based on their roles (e.g., admin, user, guest).</li>
+        </ul>
+    </div>
+    
+    <div id="non-functional-requirements">
+        <div class="anchor" id="non-functional-requirements"></div>
+        <h2>Non-Functional Requirements</h2>
+        <p>This section outlines the system attributes that enhance the operability, usability, and efficiency of the Flask login application.</p>
+        <ul>
+            <li><strong>Performance:</strong> The login process should be efficient, with user authentication occurring within seconds of submitting credentials.</li>
+            <li><strong>Security:</strong> All user data, including passwords, should be securely stored using encryption. The application should protect against common security threats like SQL injection and XSS.</li>
+            <li><strong>Scalability:</strong> The application should handle a large number of simultaneous users without degradation in performance.</li>
+            <li><strong>Usability:</strong> The user interface should be intuitive and easy to use, requiring minimal training for new users.</li>
+            <li><strong>Reliability:</strong> The system should have high availability and minimize downtime through effective error handling and robust architecture.</li>
+            <li><strong>Maintainability:</strong> The code should be well-documented and structured to facilitate easy updates and maintenance.</li>
+        </ul>
+    </div>
+
+    <div id="feasibility-study">
+        <div class="anchor" id="feasibility-study"></div>
+        <h2>Feasibility Study</h2>
+        <p>This section evaluates the feasibility of the Flask login application by examining various critical aspects necessary for successful project completion and operation.</p>
+        
+        <h3>Tech Stack Analysis</h3>
+        <p>Analyzing the technology stack to ensure that it supports all functional and non-functional requirements effectively:</p>
+        <ul>
+            <li><strong>Frontend:</strong> HTML, CSS - Provides the user interface and interactivity.</li>
+            <li><strong>Backend:</strong> Flask (Python) - Serves as the server-side framework for handling business logic.</li>
+            <li><strong>Database:</strong> PostgreSQL - Manages and stores user data securely.</li>
+            <li><strong>Authentication:</strong> Flask-Login, OAuth - Manages user sessions and supports SSO integrations.</li>
+            <li><strong>Security:</strong> bcrypt for hashing, SSL/TLS for secure data transmission.</li>
+        </ul>
+    
+        <h3>Cost Analysis</h3>
+        <p>Estimation of the total cost involved in developing, deploying, and maintaining the login system:</p>
+        <ul>
+            <li><strong>Development Costs:</strong> Man-hours for design, development, and testing.</li>
+            <li><strong>Infrastructure Costs:</strong> Server hosting, databases, backup services, and other cloud services fees.</li>
+            <li><strong>Maintenance Costs:</strong> Ongoing support, updates, security audits, and compliance checks.</li>
+        </ul>
+    
+        <h3>Potential Risks</h3>
+        <p>Identifying possible risks that might affect the project's success and user adoption:</p>
+        <ul>
+            <li><strong>Technical Failures:</strong> Issues in the login system that could lead to access problems or data loss.</li>
+            <li><strong>Security Vulnerabilities:</strong> Potential exploitation of security flaws leading to unauthorized access or data breaches.</li>
+            <li><strong>Compliance and Regulatory Issues:</strong> Failure to meet legal and regulatory requirements for data handling.</li>
+        </ul>
+    
+        <h3>Mitigation Strategies</h3>
+        <p>Strategies to address and mitigate the identified risks:</p>
+        <ul>
+            <li><strong>Regular Audits and Updates:</strong> Conduct regular security audits and update the software components to mitigate vulnerabilities.</li>
+            <li><strong>Data Encryption and Backup:</strong> Use strong encryption methods for data storage and transmission, and implement robust data backup practices.</li>
+            <li><strong>Compliance Checks:</strong> Regular reviews of compliance with data protection regulations to ensure all legal requirements are met.</li>
+        </ul>
+    </div>
+    
+    <div id="project-plan">
+        <div class="anchor" id="project-plan"></div>
+        <h2>Project Plan</h2>
+        <p>This section provides a detailed overview of the project plan for the Flask login application, outlining the project objectives and the expected deliverables.</p>
+        
+        <h3>Project Objectives</h3>
+        <p>Key objectives that the project aims to achieve:</p>
+        <ul>
+            <li><strong>User Authentication:</strong> Develop a secure and efficient user authentication system that supports both traditional and SSO logins.</li>
+            <li><strong>Data Security:</strong> Ensure that all user data is securely handled and stored, complying with the latest security standards and regulations.</li>
+            <li><strong>Usability:</strong> Create a user-friendly interface that simplifies the process of logging in and managing user accounts.</li>
+            <li><strong>Scalability:</strong> Design the system to easily handle an increasing number of users and sessions without degradation in performance.</li>
+        </ul>
+    
+        <h3>Deliverables</h3>
+        <p>List of key deliverables for the project:</p>
+        <ul>
+            <li><strong>Login Page:</strong> A functional login page supporting username/password and SSO methods.</li>
+            <li><strong>User Dashboard:</strong> A personalized dashboard that users see upon logging in, which varies based on user roles.</li>
+            <li><strong>Admin Panel:</strong> A backend system for administrators to manage user accounts and view system analytics.</li>
+            <li><strong>Documentation:</strong> Comprehensive user and technical documentation that includes setup, usage, and maintenance guides.</li>
+            <li><strong>Test Suite:</strong> A complete set of automated tests ensuring the application's functionality and stability over time.</li>
+        </ul>
+    
+        <h3>Project Timeline</h3>
+        <p>Outline of the planned timeline for achieving the project milestones:</p>
+        <ul>
+            <li><strong>Phase 1 - Planning and Design:</strong> Completion of system design and project roadmap by [specific date].</li>
+            <li><strong>Phase 2 - Development:</strong> Core development phase from [start date] to [end date], focusing on establishing all fundamental functionalities.</li>
+            <li><strong>Phase 3 - Testing and Deployment:</strong> Begin testing on [date], with planned deployment by [deployment date].</li>
+            <li><strong>Phase 4 - Maintenance and Updates:</strong> Ongoing maintenance starting from [start date of maintenance] with periodic updates based on user feedback and system performance.</li>
+        </ul>
+    </div>
+    
+    <div id="system-analysis">
+        <div class="anchor" id="system-analysis"></div>
+        <h2>System Analysis</h2>
+        <p>This section delves into the detailed analysis of the system components, their interactions, and the technical requirements necessary to implement the Flask login application effectively.</p>
+        
+        <h3>System Architecture</h3>
+        <p>Overview of the system architecture, explaining how different components of the application interact with each other:</p>
+        <ul>
+            <li><strong>Client-Side:</strong> Users interact with the web application via browsers. The front-end is built using HTML, CSS to provide a responsive interface.</li>
+            <li><strong>Server-Side:</strong> Flask, a Python-based web framework, handles the business logic, authentication processes, and data transactions between the client and the database.</li>
+            <li><strong>Database:</strong> PostgreSQL is used to store user credentials and session data securely. The system ensures data integrity and supports complex queries.</li>
+            <li><strong>Authentication:</strong> Utilizes Flask-Login for session management and OAuth for supporting SSO capabilities with external providers like Google and Microsoft.</li>
+        </ul>
+    
+        <h3>System Dependencies</h3>
+        <p>List of external libraries, frameworks, and systems the application depends on:</p>
+        <ul>
+            <li><strong>Flask:</strong> As the web framework for creating the web application.</li>
+            <li><strong>PostgreSQL:</strong> For database services to store and manage user data.</li>
+            <li><strong>Redis:</strong> Used as a session cache to enhance the performance and scalability of user sessions.</li>
+            <li><strong>Bcrypt:</strong> For hashing user passwords securely before storing them in the database.</li>
+            <li><strong>OAuth Libraries:</strong> To implement SSO functionality, integrating with various third-party services.</li>
+        </ul>
+    
+        <h3>Technical Requirements</h3>
+        <p>Detailed technical requirements necessary to support the functionality and performance of the system:</p>
+        <ul>
+            <li><strong>Performance Requirements:</strong> The system should handle a predefined number of concurrent sessions without performance degradation.</li>
+            <li><strong>Security Requirements:</strong> Must comply with the latest security standards, including secure data transmission, encrypted storage, and regular security audits.</li>
+            <li><strong>Scalability Requirements:</strong> Must be scalable to support an increasing number of users, facilitated by load balancing and efficient database management.</li>
+            <li><strong>Maintenance Requirements:</strong> System should be easy to update and maintain, with clear logging and monitoring capabilities.</li>
+        </ul>
+    </div>
+
+    <div id="appendix">
+        <div class="anchor" id="appendix"></div>
+        <h2>Appendix</h2>
+        <p>The Appendix section of our documentation provides additional information that supports and enhances the understanding of our login system. This includes a glossary of terms and a list of further resources for more in-depth information.</p>
+        <h3>Glossary</h3>
+        <ul>
+            <li><strong>SSO (Single Sign-On):</strong> A session/user authentication process that allows a user to enter one name and password in order to access multiple applications.</li>
+            <li><strong>bcrypt:</strong> A password hashing function designed for securing passwords.</li>
+            <li><strong>RBAC (Role-Based Access Control):</strong> A method of restricting system access to authorized users based on their roles.</li>
+            <li><strong>Redis:</strong> An open-source, in-memory data structure store, used as a database, cache, and message broker.</li>
+            <li><strong>PostgreSQL:</strong> An open-source relational database management system emphasizing extensibility and SQL compliance.</li>
+            <li><strong>NGINX:</strong> A web server which can also be used as a reverse proxy, load balancer, and HTTP cache.</li>
+        </ul>
+        <h3>Additional Resources</h3>
+        <ul>
+            <li><a href="https://flask.palletsprojects.com/">Flask Documentation</a>: The official Flask documentation provides extensive guides and tutorials on how to use Flask for web development.</li>
+            <li><a href="https://www.postgresql.org/docs/">PostgreSQL Tutorials</a>: Detailed documentation and learning resources for PostgreSQL.</li>
+            <li><a href="https://redis.io/documentation">Redis Documentation</a>: Comprehensive resource for learning about Redis capabilities and functionalities.</li>
+        </ul>
+    </div>
 </div>
 </body>
 </html>
