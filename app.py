@@ -253,12 +253,15 @@ def admin3():
     return render_template('admin_logs.html')
 
 @app.route('/admin_manage', methods=['GET', 'POST'])
-def assign_role():
+def admin_manage():
     users = []  # Initialize an empty list for users
     selected_role = None  # Keep track of the selected role for deletion
     roles = ['admin', 'developer', 'user']  # Assuming these are your roles
     is_delete = False
     is_update = False
+
+    # Fetch users for display
+    users = get_all_users()  # Fetch all users for display
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -275,20 +278,17 @@ def assign_role():
             if username and role:
                 update_user(username, role)
                 flash('Role updated successfully!', 'success')
-                return redirect(url_for('assign_role'))
+                return redirect(url_for('admin_manage'))
         elif action == 'delete':
-            is_delete = True
-            selected_role = request.form.get('role')
-            if selected_role:
-                users = get_users_by_role(selected_role)  # Fetch users of the selected role
-        elif action == 'perform_delete':
-            username = request.form.get('username')
-            if username:
-                delete_user(username)  # Perform the deletion
-                flash('User deleted successfully!', 'success')
-                return redirect(url_for('assign_role'))
+            users = get_all_users()  # Fetch all users for display
+            usernames = request.form.getlist('usernames[]')  # Get list of selected usernames
+            if usernames:
+                for username in usernames:
+                    delete_user(username)  # Perform deletion for each selected user
+                flash('Selected users deleted successfully!', 'success')
+                return redirect(url_for('admin_manage'))
 
-    return render_template('assign_role.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
+    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
 
 # Callback route
 @app.route('/callback')

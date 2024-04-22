@@ -37,8 +37,66 @@
         .dashboard-item span {
             text-align: center; /* Center align the text */
         }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: #333; /* Dark text color */
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd; /* Light gray border */
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #004080; /* Dark blue */
+            color: #fff; /* White text */
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* Light gray for even rows */
+        }
+
+        tr:nth-child(odd) {
+            background-color: #cce0ff; /* Light blue for odd rows */
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        form {
+            display: block;
+            margin-bottom: 20px; /* Add margin between forms */
+        }
+
+        label, select, input, button {
+            display: block; /* Display elements vertically */
+            margin-bottom: 10px; /* Add spacing between elements */
+        }
+
+        span.error-message {
+            visibility: hidden;
+            color: red;
+            margin-bottom: 10px; /* Add spacing below error messages */
+        }
+
+        span.success-message {
+            visibility: hidden;
+            color: green;
+            margin-bottom: 10px; /* Add spacing below success messages */
+        }
     </style>
-    
+   
     <script>
         function showForm(formId) {
             document.getElementById('createForm').style.display = 'none';
@@ -70,6 +128,17 @@
             var roleToDelete = document.getElementById('roleToDelete').value;
             if (roleToDelete === "") {
                 document.getElementById('roleToDeleteError').style.visibility = 'visible';
+            } else {
+                document.getElementById('deleteForm').submit();
+            }
+        }
+    </script>
+    <script>
+        function submitDeleteForm() {
+            var checkboxes = document.querySelectorAll('input[name="usernames[]"]:checked');
+            if (checkboxes.length === 0) {
+                document.getElementById('delete-user-error').style.visibility = 'visible';
+                return false;
             } else {
                 document.getElementById('deleteForm').submit();
             }
@@ -193,7 +262,7 @@
             <option value="{{ user[0] }}">{{ user[0] }}</option>
             {% endfor %}
         </select>
-        <span id="usernameToUpdateError" style="visibility: hidden; color: red;">Please select a user to update.</span>
+        <span class="error-message" id="usernameToUpdateError">Please select a user to update.</span>
         <label for="roleToUpdate">Select New Role:</label>
         <select name="new_role" id="update_new_role">
             <option value="">Select Role</option>
@@ -201,43 +270,38 @@
             <option value="{{ role }}" {% if selected_role == role %} selected {% endif %}>{{ role }}</option>
             {% endfor %}
         </select>
-        <span id="newRoleError" style="visibility: hidden; color: red;">Please select a new role.</span>
-        <span id="sameNewRoleError" style="visibility: hidden; color: red;">New role cannot be the same as the current role.</span>
-        <span id="update-success" style="visibility: hidden; color: green;">User role is updated!</span>
+        <span class="error-message" id="newRoleError">Please select a new role.</span>
+        <span class="error-message" id="sameNewRoleError">New role cannot be the same as the current role.</span>
+        <span class="success-message" id="update-success">User role is updated!</span>
         <input type="submit" value="Submit" id="update-submit">
-        <button type="button" onclick="location.href='/assign_role'">Cancel</button>
+        <button type="button" onclick="location.href='/admin_manage'">Cancel</button>
     </form>
     {% endif %}
     
     <form id="deleteForm" style="display:none;" method="post">
         <input type="hidden" name="action" value="delete">
-        <label for="roleToDelete">Select Role to Delete:</label>
-        <select name="role" id="roleToDelete">
-            <option value="">Select Role</option>
-            {% for role in roles %}
-            <option value="{{ role }}" {% if selected_role == role %} selected {% endif %}>{{ role }}</option>
-            {% endfor %}
-        </select>
-        <button type="button" id="delete-role" onclick="submitRoleForm()">Select Role</button>
-    </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td><input type="checkbox" name="usernames[]" value="{{ user[0] }}"></td>
+                    <td>{{ user[0] }}</td>
+                    <td>{{ user[1] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="button" value="Delete Selected Users" onclick="submitDeleteForm()">
+    </form>    
 
-    {% if is_delete %}
-    <form method="post" style="display:block;" onsubmit="return validateDeleteForm()">
-        <input type="hidden" name="action" value="perform_delete">
-        <label for="usernameToDelete">Select User to Delete:</label>
-        <select name="username" id="usernameToDelete">
-            <option value="">Select User</option>
-            {% for user in users %}
-            <option value="{{ user[0] }}">{{ user[0] }}</option>
-            {% endfor %}
-        </select>
-        <span id="usernameToDeleteError" style="visibility: hidden; color: red;">Please select a user to delete.</span>
-        <span id="delete-success" style="visibility: hidden; color: green;">User is deleted!</span>
-        <input type="submit" value="Delete" id="delete-submit">
-        <button type="button" onclick="location.href='/assign_role'">Cancel</button>
-    </form>
-    {% endif %}
-
+    <span id="delete-user-error" style="visibility: hidden; color: red;">Please select at least one user to delete.</span>
     <span id="roleToUpdateError" style="visibility: hidden; color: red;">Please select a role to update.</span>
     <span id="roleToDeleteError" style="visibility: hidden; color: red;">Please select a role to delete.</span>
     <span id="usernameToUpdateError" style="visibility: hidden; color: red;">Please select a user to update.</span>

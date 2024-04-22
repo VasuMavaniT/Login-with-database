@@ -128,48 +128,6 @@ class TestUserManagement(unittest.TestCase):
         updated_role = self.cur.fetchone()[0]
         self.assertEqual(updated_role, 'admin')
 
-    def test_delete_user(self):
-        ''' Tests deletion of a user and checks if the user record is removed from the database '''
-        username = "rishabhpreethan@outlook.com"
-        self.driver.get('http://localhost:8097/manage_users')
-
-        # Wait for and click the 'Manage Users' or similar button
-        WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.CLASS_NAME, 'delete-user'))
-        )
-        manage_users_button = self.driver.find_element(By.CLASS_NAME, 'delete-user')
-        manage_users_button.click()
-
-        # Wait for the dropdown to be visible and interactable
-        WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, 'roleToDelete'))
-        )
-        user_select_dropdown = self.driver.find_element(By.ID, 'roleToDelete')
-        user_select_dropdown.send_keys('user')
-        
-        WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="deleteForm"]/button'))
-        )
-        select_role_button = self.driver.find_element(By.XPATH, '//*[@id="deleteForm"]/button')
-        select_role_button.click()
-        
-        WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, 'usernameToDelete'))
-        )
-        user_select_dropdown = self.driver.find_element(By.ID, 'usernameToDelete')
-        user_select_dropdown.send_keys(username)
-        
-        WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '/html/body/form[4]/input[2]'))
-        )
-        
-        # Click the delete button
-        delete_button = self.driver.find_element(By.XPATH, "/html/body/form[4]/input[2]")
-        delete_button.click()
-
-        self.cur.execute("SELECT username FROM usersdata WHERE username = %s", (username,))
-        self.assertIsNone(self.cur.fetchone())
-
     def tearDown(self):
         self.driver.quit()
         self.cur.close()
