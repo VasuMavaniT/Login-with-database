@@ -108,6 +108,7 @@
     <ul>
         <li><a href="#introduction">Introduction</a></li>
         <li><a href="#getting-started">Getting Started</a></li>
+        <li><a href="#deployment">Deployment</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#caching">Caching</a></li>
         <li><a href="#database-management">Database Management</a></li>
@@ -193,6 +194,71 @@
             <li>Start your Flask application to verify it runs correctly: <pre><code>flask run</code></pre></li>
         </ul>
     </div>
+    
+    <div id="deployment">
+        <div class="anchor" id="deployment"></div>
+        <h2>Deployment</h2>
+        <p>This section provides detailed instructions on deploying the application components using Docker Compose. Ensure Docker and Docker Compose are installed on your system before proceeding.</p>
+        <h3>Docker Compose Configuration</h3>
+        <p>Below is the docker-compose.yml configuration for setting up the services:</p>
+        <pre><code>version: '3.7'
+    services:
+      db:
+        image: postgres
+        restart: unless-stopped
+        container_name: db
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mydatabase
+        ports:
+          - '9432:5432'
+        volumes:
+          - ./backup.sql:/docker-entrypoint-initdb.d/backup.sql
+        networks:
+          - sample_network
+        
+      redis:
+        image: redis
+        restart: unless-stopped
+        container_name: redis
+        ports:
+          - "6479:6379"
+        networks:
+          - sample_network
+    
+      app1:
+        build: .
+        depends_on:
+          - db
+          - redis
+        environment:
+          FLASK_RUN_PORT: 8097
+        ports:
+          - "8097:8097"
+        networks:
+          - sample_network
+    
+      app2:
+        build: .
+        depends_on:
+          - db
+          - redis
+        environment:
+          FLASK_RUN_PORT: 8098
+        ports:
+          - "8098:8097"
+        networks:
+          - sample_network
+    
+    networks:
+      sample_network:
+        driver: bridge
+        </code></pre>
+        <h3>Network Configuration</h3>
+        <p>The <code>sample_network</code> custom network ensures that all services can communicate securely. This network uses the bridge driver, providing isolated networking for the containers involved.</p>
+    </div>
+    
     
     
 
@@ -324,7 +390,6 @@
         <h3>Load Balancing</h3>
         <ul>
             <li><strong>Overview:</strong> Utilization of load balancing techniques to distribute incoming traffic across multiple servers, thus enhancing the application's ability to handle large volumes of requests smoothly.</li>
-            <li><strong>Implementation with Azure:</strong> Steps to configure Azure Load Balancers to manage the traffic effectively, ensuring optimal performance and uptime.</li>
         </ul>
     </div>
     
