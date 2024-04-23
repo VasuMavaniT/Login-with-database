@@ -77,12 +77,22 @@
             color: #fff;
         }
 
+        #loginForm input[type="username"] {
+            margin-top: 1px;
+        }   
+
+        #loginForm input[type="password"] {
+            margin-top: 0.001px; 
+            margin-bottom: 1px;
+        }        
+
         .error {
             color: #ff4500; /* Red-orange color for errors */
             font-size: 0.875em;
-            height: 1em;
-            margin-bottom: 10px;
+            margin-bottom: 1px;
+            margin-top: 1px;
         }
+
     </style>
 </head>
 <body>
@@ -92,9 +102,9 @@
         <h2>Login</h2>
         <form id="loginForm" method="post">
             {{ form.hidden_tag() }}
-            <p><label for="username">Username:</label><br><input type="text" id="username" name="username"></p>
+            <p><input type="text" id="username" name="username" placeholder="Enter Username"></p>
             <p class="error usernameError"></p> <!-- Error message for username -->
-            <p><label for="password">Password:</label><br><input type="password" id="password" name="password"></p>
+            <p><input type="password" id="password" name="password" placeholder="Enter password"></p>
             <p class="error passwordError"></p> <!-- Error message for password -->
             <p><input type="submit" id="submit" name="submit" value="Submit"></p>
         </form>
