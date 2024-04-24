@@ -12,15 +12,21 @@ try:
     cur = conn.cursor()
 
     # SQL statement to drop the table
-    drop_table_query = "DROP TABLE IF EXISTS usersdata;"
+    drop_usersdata = "DROP TABLE IF EXISTS usersdata;"
+    drop_users = "DROP TABLE IF EXISTS users;"
+    drop_roles = "DROP TABLE IF EXISTS roles;"
+    drop_userroles = "DROP TABLE IF EXISTS userroles;"
 
     # Execute the SQL statement
-    cur.execute(drop_table_query)
+    cur.execute(drop_usersdata)
+    cur.execute(drop_userroles)
+    cur.execute(drop_users)
+    cur.execute(drop_roles)
 
     # Commit the transaction
     conn.commit()
 
-    print("Table 'usersdata' deleted successfully")
+    print("Tables are deleted successfully.")
 
 except psycopg2.Error as e:
     print("Error deleting table:", e)

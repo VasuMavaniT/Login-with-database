@@ -5,9 +5,8 @@ from wtforms.validators import InputRequired
 import psycopg2
 import secrets
 import bcrypt
-import redis
+# import redis
 import logging
-from insert_data_final import insert_initial_data
 from authlib.integrations.flask_client import OAuth
 
 secret_key = secrets.token_hex(16)
@@ -29,7 +28,7 @@ auth0 = oauth.register(
 )
 
 # Setup Redis
-redis_client = redis.Redis(host='redis', port=6379, db=0, decode_responses=True)
+# redis_client = redis.Redis(host='redis', port=6379, db=0, decode_responses=True)
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
@@ -47,9 +46,8 @@ def connect_db():
         conn = psycopg2.connect(
             dbname="mydatabase",
             user="postgres",
-            password="postgres",
-            host="db",
-            port=5432
+            password="admin",
+            host="localhost"
         )
         return conn, conn.cursor()
     except psycopg2.Error as e:
@@ -72,10 +70,19 @@ def authenticate_user(username, password):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT password, role FROM usersdata WHERE username = %s", (username,))
+            # Query to join Users and UserRoles and Roles tables to get password and role
+            cur.execute("""
+            SELECT u.password, r.rolename 
+            FROM Users u
+            JOIN UserRoles ur ON u.userid = ur.userid
+            JOIN Roles r ON ur.roleid = r.roleid
+            WHERE u.username = %s;
+            """, (username,))
+
             user_record = cur.fetchone()
             if user_record:
                 stored_password, user_role = user_record
+                # Check if the provided password matches the stored hashed password
                 if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
                     return username, user_role
             return None
@@ -90,15 +97,38 @@ def create_new_user(username, password, role='user'):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT * FROM usersdata WHERE username = %s", (username,))
+            userid = "U" + username  # Generate userid by concatenating 'U' with the username
+            # Check if user already exists
+            cur.execute("SELECT userid FROM Users WHERE userid = %s", (userid,))
             if cur.fetchone() is None:
+                # Hash password
                 hashed_password = hash_password(password).decode('utf-8')
-                cur.execute("INSERT INTO usersdata (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
-                conn.commit()
+                
+                # Insert new user into Users table
+                cur.execute("INSERT INTO Users (userid, username, password) VALUES (%s, %s, %s);",
+                            (userid, username, hashed_password))
+
+                # Get role id from Roles table
+                cur.execute("SELECT roleid FROM Roles WHERE rolename = %s;", (role,))
+                role_record = cur.fetchone()
+                if not role_record:
+                    # If role doesn't exist, insert it and get the new roleid
+                    cur.execute("INSERT INTO Roles (roleid, rolename) VALUES (DEFAULT, %s) RETURNING roleid;", (role,))
+                    roleid = cur.fetchone()[0]
+                else:
+                    roleid = role_record[0]
+
+                # Insert into UserRoles table
+                cur.execute("INSERT INTO UserRoles (userid, roleid) VALUES (%s, %s);", (userid, roleid))
+
                 # Invalidate cache
-                redis_client.delete('all_users')
+                # redis_client.delete('all_users')
+
+                conn.commit()
+                # flash('User created successfully!', 'success')
                 return True
             else:
+                # flash('Username already exists!', 'error')
                 return False
         except psycopg2.Error as e:
             print("Error executing SQL:", e)
@@ -109,35 +139,53 @@ def create_new_user(username, password, role='user'):
 def get_all_users():
     '''This function is used to fetch all users.'''
     # Check cache first
-    users = redis_client.get('all_users')
-    if users:
-        # logging.info("Fetching from cache: All Users")
-        print("Fetching from cache: All Users")
-        return eval(users)
+    # users = redis_client.get('all_users')
+    # if users:
+    #     print("Fetching from cache: All Users")
+    #     return eval(users.decode('utf-8'))  # Ensure to decode if Redis returns bytes
 
     # Fetch from database if not in cache
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT username, role FROM usersdata;")
+            # Join Users, UserRoles, and Roles tables to fetch usernames and their roles
+            cur.execute("""
+                SELECT u.username, r.rolename
+                FROM Users u
+                JOIN UserRoles ur ON u.userid = ur.userid
+                JOIN Roles r ON ur.roleid = r.roleid;
+            """)
             users = cur.fetchall()
-            redis_client.set('all_users', str(users), ex=3600)  # Cache for 1 hour
-            # logging.info("Fetching from database and setting cache: All Users")
+
+            # Cache the results with expiration set to 1 hour
+            # redis_client.set('all_users', str(users), ex=3600)
             print("Fetching from database and setting cache: All Users")
             return users
+        except psycopg2.Error as e:
+            print("Error executing SQL query:", e)
         finally:
             close_db(conn, cur)
     return []
 
 def update_user(username, role):
-    '''This function is used to update a user.'''
+    '''This function is used to update a user's role.'''
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("UPDATE usersdata SET role = %s WHERE username = %s;", (role, username))
-            conn.commit()
-            # Invalidate cache
-            redis_client.delete('all_users')
+            # Get user ID from Users table
+            cur.execute("SELECT userid FROM Users WHERE username = %s;", (username,))
+            userid = cur.fetchone()
+            if userid:
+                # Get role ID from Roles table
+                cur.execute("SELECT roleid FROM Roles WHERE rolename = %s;", (role,))
+                roleid = cur.fetchone()
+                if roleid:
+                    # Update UserRoles table
+                    cur.execute("UPDATE UserRoles SET roleid = %s WHERE userid = %s;", (roleid[0], userid[0]))
+                    conn.commit()
+                # Invalidate cache
+                # redis_client.delete('all_users')
+                # redis_client.delete(f'users_by_role:{role}')
         finally:
             close_db(conn, cur)
 
@@ -146,29 +194,44 @@ def delete_user(username):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("DELETE FROM usersdata WHERE username = %s;", (username,))
-            conn.commit()
+            # Get user ID from Users table
+            cur.execute("SELECT userid FROM Users WHERE username = %s;", (username,))
+            userid = cur.fetchone()
+            if userid:
+                # Delete from UserRoles table first
+                cur.execute("DELETE FROM UserRoles WHERE userid = %s;", (userid[0],))
+                # Delete user from Users table
+                cur.execute("DELETE FROM Users WHERE userid = %s;", (userid[0],))
+                conn.commit()
             # Invalidate cache
-            redis_client.delete('all_users')
+            # redis_client.delete('all_users')
         finally:
             close_db(conn, cur)
 
 def get_users_by_role(role):
     '''This function is used to fetch users by role.'''
     # Check cache first
-    cached_users = redis_client.get(f'users_by_role:{role}')
-    if cached_users:
-        logging.info(f"Fetching from cache: Users by role {role}")
-        return eval(cached_users)
+    # cached_users = redis_client.get(f'users_by_role:{role}')
+    # if cached_users:
+    #     print(f"Fetching from cache: Users by role {role}")
+    #     return eval(cached_users.decode('utf-8'))
 
     # Fetch from database if not in cache
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT username, role FROM usersdata WHERE role = %s;", (role,))
+            # Join Users, UserRoles, and Roles tables to fetch usernames
+            cur.execute("""
+                SELECT u.username
+                FROM Users u
+                JOIN UserRoles ur ON u.userid = ur.userid
+                JOIN Roles r ON ur.roleid = r.roleid
+                WHERE r.rolename = %s;
+            """, (role,))
             users = cur.fetchall()
-            redis_client.set(f'users_by_role:{role}', str(users), ex=3600)  # Cache for 1 hour
-            logging.info(f"Fetching from database and setting cache: Users by role {role}")
+            # Cache the results with expiration set to 1 hour
+            # redis_client.set(f'users_by_role:{role}', str(users), ex=3600)
+            print(f"Fetching from database and setting cache: Users by role {role}")
             return users
         finally:
             close_db(conn, cur)
@@ -189,7 +252,8 @@ def home():
             if cur.fetchone()[0] == 0:
                 # Run data insertion in the background
                 from threading import Thread
-                thread = Thread(target=insert_initial_data)
+                from insert_data_final import insert_data
+                thread = Thread(target=insert_data)
                 thread.start()
         except psycopg2.Error as e:
             print("Database query failed:", e)
@@ -198,7 +262,6 @@ def home():
 
     # Render the home page
     return render_template('home.html')
-
 
 @app.route('/view_users')
 def view_users():

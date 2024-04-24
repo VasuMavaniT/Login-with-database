@@ -1,6 +1,5 @@
 import psycopg2
 
-# Function to connect to the PostgreSQL database and return the connection and cursor
 def connect_db():
     conn = psycopg2.connect(
         dbname="mydatabase",
@@ -12,22 +11,43 @@ def connect_db():
     cur = conn.cursor()
     return conn, cur
 
-def create_usersdata_table():
+def create_tables():
     conn, cur = connect_db()
-    create_table_query = """
-    CREATE TABLE usersdata (
-    username VARCHAR(50) PRIMARY KEY,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(20) NOT NULL
-    );
-    """
+    
+    try:
+        # Create the Users table
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS Users (
+            userid VARCHAR(20) PRIMARY KEY,
+            username VARCHAR(20) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL
+        );
+        """)
+        print("Table 'Users' created successfully.")
 
+        # Create the Roles table
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS Roles (
+            roleid VARCHAR(20) PRIMARY KEY,
+            rolename VARCHAR(20) UNIQUE NOT NULL
+        );
+        """)
+        print("Table 'Roles' created successfully.")
+        
+        # Create the UserRoles table
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS UserRoles (
+            userid VARCHAR(20) REFERENCES Users(userid),
+            roleid VARCHAR(20) REFERENCES Roles(roleid),
+            PRIMARY KEY (userid, roleid)
+        );
+        """)
+        print("Table 'UserRoles' created successfully.")
+    except psycopg2.Error as e:
+        print("An error occurred: ", e)
+    finally:
+        # Ensure to close cursor and connection
+        cur.close()
+        conn.close()
 
-    cur.execute(create_table_query)
-    print("Table 'usersdata' created successfully.")
-    cur.close()
-    conn.close()
-
-
-# Call the function to create the table
-create_usersdata_table()
+create_tables()
