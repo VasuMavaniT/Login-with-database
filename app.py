@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, session, render_template_string
+from flask import Flask, render_template, request, redirect, url_for, session, render_template_string
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired
@@ -97,10 +97,8 @@ def create_new_user(username, password, role='user'):
                 conn.commit()
                 # Invalidate cache
                 redis_client.delete('all_users')
-                flash('User created successfully!', 'success')
                 return True
             else:
-                # flash('Username already exists!', 'error')
                 return False
         except psycopg2.Error as e:
             print("Error executing SQL:", e)
@@ -216,11 +214,9 @@ def login():
     if form.validate_on_submit():
         user = authenticate_user(form.username.data, form.password.data)
         if user:
-            flash('Login successful!', 'success')
             return redirect(url_for('dashboard', username=user[0], role=user[1]))
         else:
             login_success = False
-            flash('Invalid username or password.', 'error')
     return render_template('login.html', form=form, login_success=login_success)
 
 @app.route('/login_using_sso', methods=['GET', 'POST'])
@@ -237,10 +233,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         if create_new_user(form.username.data, form.password.data):
-            flash('Registration successful! You can now login.', 'success')
             return redirect(url_for('login'))
-        else:
-            flash('Username already exists! Try a different one.', 'error')
     return render_template('register.html', form=form)
 
 @app.route('/dashboard')
@@ -298,7 +291,6 @@ def admin_manage():
             role = request.form.get('new_role') # Get the new role
             if username and role:
                 update_user(username, role)
-                flash('Role updated successfully!', 'success')
                 return redirect(url_for('admin_manage'))
         elif action == 'delete':
             users = get_all_users()  # Fetch all users for display
@@ -306,7 +298,6 @@ def admin_manage():
             if usernames:
                 for username in usernames:
                     delete_user(username)  # Perform deletion for each selected user
-                flash('Selected users deleted successfully!', 'success')
                 return redirect(url_for('admin_manage'))
 
     return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
