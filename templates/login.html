@@ -93,6 +93,13 @@
             margin-top: 1px;
         }
 
+        .success {
+            color: #e2f107; /* Green color for success messages */
+            font-size: 0.875em;
+            margin-bottom: 1px;
+            margin-top: 1px;
+        }
+
     </style>
 </head>
 <body>
@@ -100,8 +107,7 @@
         <img src="data:image/jpeg;base64,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" alt="Logo" class="logo"> <!-- Add your logo here -->
 
         <h2>Login</h2>
-        <form id="loginForm" method="post">
-            {{ form.hidden_tag() }}
+        <form id="loginForm" method="post" onsubmit="return validateCreateForm()">
             <p><input type="text" id="username" name="username" placeholder="Enter Username"></p>
             <p class="error usernameError"></p> <!-- Error message for username -->
             <p><input type="password" id="password" name="password" placeholder="Enter password"></p>
@@ -112,6 +118,12 @@
         {% if not login_success %}
         <span class="error">
             Invalid credentials</span>
+        {% endif %}
+
+        {% if registration_success %}
+        <span class="success">
+            Registration successful. Please login into app. 
+        </span>
         {% endif %}
 
         <!-- Register button -->
@@ -126,31 +138,34 @@
 </div>
     
         <script>
-            document.getElementById('loginForm').addEventListener('submit', function(event) {
-                var username = document.getElementById('username').value.trim();
-                var password = document.getElementById('password').value.trim();
-                var usernameError = document.querySelector('.usernameError');
-                var passwordError = document.querySelector('.passwordError');
-                var isValid = true;
-    
-                if (username === '') {
-                    usernameError.textContent = 'Username is required.';
-                    isValid = false;
-                } else {
-                    usernameError.textContent = ''; // Clear the error message
-                }
-    
-                if (password === '') {
-                    passwordError.textContent = 'Password is required.';
-                    isValid = false;
-                } else {
-                    passwordError.textContent = ''; // Clear the error message
-                }
-    
-                if (!isValid) {
-                    event.preventDefault(); // Prevent form submission if validation fails
-                }
-            });
+            function validateCreateForm()
+            {
+                document.getElementById('loginForm').addEventListener('submit', function(event) {
+                    var username = document.getElementById('username').value.trim();
+                    var password = document.getElementById('password').value.trim();
+                    var usernameError = document.querySelector('.usernameError');
+                    var passwordError = document.querySelector('.passwordError');
+                    var isValid = true;
+        
+                    if (username === '') {
+                        usernameError.textContent = 'Username is required.';
+                        isValid = false;
+                    } else {
+                        usernameError.textContent = ''; // Clear the error message
+                    }
+        
+                    if (password === '') {
+                        passwordError.textContent = 'Password is required.';
+                        isValid = false;
+                    } else {
+                        passwordError.textContent = ''; // Clear the error message
+                    }
+        
+                    if (!isValid) {
+                        event.preventDefault(); // Prevent form submission if validation fails
+                    }
+                });
+            }
         </script>
 </body>
 </html>

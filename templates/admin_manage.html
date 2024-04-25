@@ -95,6 +95,21 @@
             color: green;
             margin-bottom: 10px; /* Add spacing below success messages */
         }
+
+        .error {
+            color: #ff4500; /* Red-orange color for errors */
+            font-size: 0.875em;
+            margin-bottom: 1px;
+            margin-top: 1px;
+        }
+
+        .success
+        {
+            color: green;
+            font-size: 0.875em;
+            margin-bottom: 1px;
+            margin-top: 1px;
+        }
     </style>
    
     <script>
@@ -104,6 +119,16 @@
             document.getElementById('deleteForm').style.display = 'none';
             document.getElementById(formId).style.display = 'block';
         }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var messages = document.querySelectorAll('.success, .error');
+                messages.forEach(function(message) {
+                    message.style.display = 'none';
+                });
+            }, 3000);
+        });
     </script>
     <script>
         function validateCreateForm() {
@@ -224,6 +249,42 @@
         </div>
     </div>
     
+    {% if creation_failed %}
+    <p id="creationFailed" class="error">
+        Creating new user failed. Please try again.
+    </p>
+    {% endif %}
+
+    {% if update_failed %}
+        <p id="updateFailed" class="error">
+            Updating user role failed. Please try again.
+        </p>
+    {% endif %}
+
+    {% if deletion_failed %}
+        <p id="deletionFailed" class="error">
+            Deleting user failed. Please try again.
+        </p>
+    {% endif %}
+
+    {% if update_success %}
+        <p id="updateSuccess" class="success">
+            User role is updated!
+        </p>
+    {% endif %}
+
+    {% if deletion_success %}
+        <p id="deletionSuccess" class="success">
+            Users deleted successfully!
+        </p>
+    {% endif %}
+
+    {% if creation_success %}
+        <p id="creationSuccess" class="success">
+            New user is created!
+        </p>
+    {% endif %}
+
     
     <form id="createForm" style="display:none" method="post" onsubmit="return validateCreateForm()">
         <input type="hidden" name="action" value="create">
@@ -237,7 +298,6 @@
                 <option value="developer">Developer</option>
               </select><br>
         <input type="submit" value="Submit" id="new-submit">
-        <span id="create-success" style="visibility: hidden; color: green;">New user is created!</span>
     </form>
 
     <form id="updateForm" style="display:none;" method="post">
@@ -272,7 +332,6 @@
         </select>
         <span class="error-message" id="newRoleError">Please select a new role.</span>
         <span class="error-message" id="sameNewRoleError">New role cannot be the same as the current role.</span>
-        <span class="success-message" id="update-success">User role is updated!</span>
         <input type="submit" value="Submit" id="update-submit">
         <button type="button" onclick="location.href='/admin_manage'">Cancel</button>
     </form>

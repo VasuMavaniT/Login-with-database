@@ -56,10 +56,13 @@ def connect_db():
 
 def close_db(conn, cur):
     '''This function is used to close the database connection.'''
-    if cur:
-        cur.close()
-    if conn:
-        conn.close()
+    try:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+    except:
+        print("Error closing database connection.")
 
 def hash_password(password):
     """Hash a password for storing."""
@@ -90,7 +93,7 @@ def authenticate_user(username, password):
             print("Error executing SQL query:", e)
         finally:
             close_db(conn, cur)
-    return None
+    return False
 
 def create_new_user(username, password, role='user'):
     '''This function is used to create a new user.'''
@@ -125,10 +128,8 @@ def create_new_user(username, password, role='user'):
                 # redis_client.delete('all_users')
 
                 conn.commit()
-                # flash('User created successfully!', 'success')
                 return True
             else:
-                # flash('Username already exists!', 'error')
                 return False
         except psycopg2.Error as e:
             print("Error executing SQL:", e)
@@ -270,17 +271,21 @@ def view_users():
     return render_template('view_users.html', users=users)
 
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def login(registration_success=False):
     '''This function is used to login using a username and password.'''
-    form = LoginForm()
     login_success = True
-    if form.validate_on_submit():
-        user = authenticate_user(form.username.data, form.password.data)
+    
+    if request.method == 'POST':
+        user = authenticate_user(request.form.get('username'), request.form.get('password'))
         if user:
             return redirect(url_for('dashboard', username=user[0], role=user[1]))
         else:
             login_success = False
-    return render_template('login.html', form=form, login_success=login_success)
+    try:
+        registration_success = request.args.get('registration_success')
+    except:
+        registration_success = False
+    return render_template('login.html', login_success=login_success, registration_success=registration_success)
 
 @app.route('/login_using_sso', methods=['GET', 'POST'])
 def login_using_sso():
@@ -296,8 +301,12 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         if create_new_user(form.username.data, form.password.data):
-            return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+            registration_success = True
+            # Pass registration_success to redirect to login page with a success message
+            return redirect(url_for('login', registration_success=True))
+        else:
+            return render_template('register.html', form=form, registration_success=False)
+    return render_template('register.html', form=form, registration_success=True)
 
 @app.route('/dashboard')
 def dashboard():
@@ -343,27 +352,73 @@ def admin_manage():
     if request.method == 'POST':
         action = request.form.get('action')
         if action == 'create':
-            create_new_user(request.form.get('new-username'), request.form.get('new-password'), request.form.get('new-role'))        
+            try:
+                check = create_new_user(request.form.get('new-username'), request.form.get('new-password'), request.form.get('new-role'))        
+                if check == True:
+                    return redirect(url_for('admin_manage', creation_success='True'))
+                else:
+                    return redirect(url_for('admin_manage', creation_failed = True))
+            except:
+                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, deletion_failed = False, update_failed = False, creation_failed = True, creation_success = False, deletion_success = False, update_success = False)
         elif action == 'update':
-            is_update = True
-            selected_role = request.form.get('role')
-            if selected_role:
-                users = get_users_by_role(selected_role)  # Fetch users of the selected role
+            try:
+                is_update = True
+                selected_role = request.form.get('role')
+                if selected_role:
+                    users = get_users_by_role(selected_role)  # Fetch users of the selected role
+            except:
+                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, deletion_failed = False, update_failed = True, creation_failed = False, creation_success = False, deletion_success = False, update_success = False)
         elif action == 'perform_update':
-            username = request.form.get('username')
-            role = request.form.get('new_role') # Get the new role
-            if username and role:
-                update_user(username, role)
-                return redirect(url_for('admin_manage'))
+            try:
+                username = request.form.get('username')
+                role = request.form.get('new_role') # Get the new role
+                if username and role:
+                    update_user(username, role)
+                    return redirect(url_for('admin_manage', update_success = True))
+            except:
+                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, deletion_failed = False, update_failed = True, creation_failed = False, creation_success = False, deletion_success = False, update_success = False)
         elif action == 'delete':
-            users = get_all_users()  # Fetch all users for display
-            usernames = request.form.getlist('usernames[]')  # Get list of selected usernames
-            if usernames:
-                for username in usernames:
-                    delete_user(username)  # Perform deletion for each selected user
-                return redirect(url_for('admin_manage'))
+            try:
+                users = get_all_users()  # Fetch all users for display
+                usernames = request.form.getlist('usernames[]')  # Get list of selected usernames
+                if usernames:
+                    for username in usernames:
+                        delete_user(username)  # Perform deletion for each selected user
+                    return redirect(url_for('admin_manage', deletion_success = True))
+            except:
+                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=True, is_update=is_update, deletion_failed = True, update_failed = False, creation_failed = False, creation_success = False, deletion_success = False, update_success = False)
 
-    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
+    try:
+        creation_success = request.args.get('creation_success')
+    except:
+        creation_success = False
+
+    try:
+        deletion_success = request.args.get('deletion_success')
+    except:
+        deletion_success = False
+
+    try:
+        update_success = request.args.get('update_success')
+    except:
+        update_success = False
+
+    try:
+        creation_failed = request.args.get('creation_failed')
+    except:
+        creation_failed = False
+
+    try:
+        deletion_failed = request.args.get('deletion_failed')
+    except:
+        deletion_failed = False
+
+    try:
+        update_failed = request.args.get('update_failed')
+    except:
+        update_failed = False
+
+    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, deletion_failed = deletion_failed, update_failed = update_failed, creation_failed = creation_failed, creation_success = creation_success, deletion_success = deletion_success, update_success = update_success)
 
 # Callback route
 @app.route('/callback')
