@@ -170,9 +170,9 @@ def get_all_users():
 
 def update_user(username, role):
     '''This function is used to update a user's role.'''
-    conn, cur = connect_db()
-    if conn and cur:
-        try:
+    try:
+        conn, cur = connect_db()
+        if conn and cur:
             # Get user ID from Users table
             cur.execute("SELECT userid FROM Users WHERE username = %s;", (username,))
             userid = cur.fetchone()
@@ -187,14 +187,17 @@ def update_user(username, role):
                 # Invalidate cache
                 # redis_client.delete('all_users')
                 # redis_client.delete(f'users_by_role:{role}')
-        finally:
             close_db(conn, cur)
+            return True
+    except:
+        return False
+
 
 def delete_user(username):
     '''This function is used to delete a user.'''
-    conn, cur = connect_db()
-    if conn and cur:
-        try:
+    try:
+        conn, cur = connect_db()
+        if conn and cur:
             # Get user ID from Users table
             cur.execute("SELECT userid FROM Users WHERE username = %s;", (username,))
             userid = cur.fetchone()
@@ -206,8 +209,10 @@ def delete_user(username):
                 conn.commit()
             # Invalidate cache
             # redis_client.delete('all_users')
-        finally:
             close_db(conn, cur)
+            return True
+    except:
+        return False
 
 def get_users_by_role(role):
     '''This function is used to fetch users by role.'''
@@ -340,14 +345,15 @@ def admin_logs_management():
 @app.route('/admin_manage', methods=['GET', 'POST'])
 def admin_manage():
     '''This function is used to manage users by the admin.'''
-    users = []  # Initialize an empty list for users
     selected_role = None  # Keep track of the selected role for deletion
     roles = ['admin', 'developer', 'user']  # Assuming these are your roles
     is_delete = False
     is_update = False
 
-    # Fetch users for display
-    users = get_all_users()  # Fetch all users for display
+    try:
+        users = get_all_users()  # Fetch all users for display
+    except:
+        users = []
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -355,11 +361,14 @@ def admin_manage():
             try:
                 check = create_new_user(request.form.get('new-username'), request.form.get('new-password'), request.form.get('new-role'))        
                 if check == True:
-                    return redirect(url_for('admin_manage', creation_success='True'))
+                    session["message"] = "User created successfully"
+                    session["message_category"] = "success"
                 else:
-                    return redirect(url_for('admin_manage', creation_failed = True))
+                    session["message"] = "User already exists"
+                    session["message_category"] = "error"
+                    return redirect(url_for('admin_manage'))
             except:
-                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, deletion_failed = False, update_failed = False, creation_failed = True, creation_success = False, deletion_success = False, update_success = False)
+                return redirect(url_for('admin_manage'))
         elif action == 'update':
             try:
                 is_update = True
@@ -367,58 +376,44 @@ def admin_manage():
                 if selected_role:
                     users = get_users_by_role(selected_role)  # Fetch users of the selected role
             except:
-                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, deletion_failed = False, update_failed = True, creation_failed = False, creation_success = False, deletion_success = False, update_success = False)
+                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
         elif action == 'perform_update':
             try:
                 username = request.form.get('username')
                 role = request.form.get('new_role') # Get the new role
                 if username and role:
-                    update_user(username, role)
-                    return redirect(url_for('admin_manage', update_success = True))
+                    if update_user(username, role):
+                        session["message"] = "User updated successfully"
+                        session["message_category"] = "success"
+                    else:
+                        session["message"] = "User update failed"
+                        session["message_category"] = "error"
+                    return redirect(url_for('admin_manage'))
             except:
-                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, deletion_failed = False, update_failed = True, creation_failed = False, creation_success = False, deletion_success = False, update_success = False)
+                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
         elif action == 'delete':
             try:
                 users = get_all_users()  # Fetch all users for display
                 usernames = request.form.getlist('usernames[]')  # Get list of selected usernames
                 if usernames:
                     for username in usernames:
-                        delete_user(username)  # Perform deletion for each selected user
-                    return redirect(url_for('admin_manage', deletion_success = True))
+                        if delete_user(username):  # Perform deletion for each selected user
+                            session["message"] = "User(s) deleted successfully"
+                            session["message_category"] = "success"
+                        else:
+                            session["message"] = "User deletion failed"
+                            session["message_category"] = "error"
+                    return redirect(url_for('admin_manage'))
             except:
-                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=True, is_update=is_update, deletion_failed = True, update_failed = False, creation_failed = False, creation_success = False, deletion_success = False, update_success = False)
+                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
 
-    try:
-        creation_success = request.args.get('creation_success')
-    except:
-        creation_success = False
+    # Check if there is a message to display
+    message = session.pop("message", None)
+    message_category = session.pop("message_category", None)
 
-    try:
-        deletion_success = request.args.get('deletion_success')
-    except:
-        deletion_success = False
+    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role,
+            is_update=is_update, message=message, message_category=message_category)
 
-    try:
-        update_success = request.args.get('update_success')
-    except:
-        update_success = False
-
-    try:
-        creation_failed = request.args.get('creation_failed')
-    except:
-        creation_failed = False
-
-    try:
-        deletion_failed = request.args.get('deletion_failed')
-    except:
-        deletion_failed = False
-
-    try:
-        update_failed = request.args.get('update_failed')
-    except:
-        update_failed = False
-
-    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, deletion_failed = deletion_failed, update_failed = update_failed, creation_failed = creation_failed, creation_success = creation_success, deletion_success = deletion_success, update_success = update_success)
 
 # Callback route
 @app.route('/callback')
