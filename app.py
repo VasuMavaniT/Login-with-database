@@ -5,8 +5,10 @@ from wtforms.validators import InputRequired
 import psycopg2
 import secrets
 import bcrypt
-# import redis
+import redis
 import logging
+from flask import Flask, session
+from flask_session import Session
 from authlib.integrations.flask_client import OAuth
 
 secret_key = secrets.token_hex(16)
@@ -28,7 +30,7 @@ auth0 = oauth.register(
 )
 
 # Setup Redis
-# redis_client = redis.Redis(host='redis', port=6379, db=0, decode_responses=True)
+redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
@@ -44,7 +46,7 @@ def connect_db():
     '''This function is used to connect to the database.'''
     try:
         conn = psycopg2.connect(
-            dbname="mydatabase",
+            dbname="postgres",
             user="postgres",
             password="admin",
             host="localhost"
@@ -128,6 +130,12 @@ def create_new_user(username, password, role='user'):
                 # redis_client.delete('all_users')
 
                 conn.commit()
+                
+                # Invalidate cache that stores all users or user details
+                redis_client.delete('all_users')
+                # Optionally, store the new user's details in the cache
+                redis_client.hset('user_details', userid, f"{username}:{hashed_password}:{role}")
+
                 return True
             else:
                 return False
@@ -139,17 +147,17 @@ def create_new_user(username, password, role='user'):
 
 def get_all_users():
     '''This function is used to fetch all users.'''
-    # Check cache first
-    # users = redis_client.get('all_users')
-    # if users:
-    #     print("Fetching from cache: All Users")
-    #     return eval(users.decode('utf-8'))  # Ensure to decode if Redis returns bytes
+    # Try to fetch the cached data
+    cached_users = redis_client.get('all_users')
+    if cached_users:
+        print("Fetching from cache: All Users")
+        return eval(cached_users)  # Deserialize and return the cached list of users
 
-    # Fetch from database if not in cache
+    # Fetch from the database if not in cache
     conn, cur = connect_db()
     if conn and cur:
         try:
-            # Join Users, UserRoles, and Roles tables to fetch usernames and their roles
+            # Query to fetch all usernames and their roles
             cur.execute("""
                 SELECT u.username, r.rolename
                 FROM Users u
@@ -158,9 +166,11 @@ def get_all_users():
             """)
             users = cur.fetchall()
 
-            # Cache the results with expiration set to 1 hour
-            # redis_client.set('all_users', str(users), ex=3600)
-            print("Fetching from database and setting cache: All Users")
+            # Cache the results with an expiration set to 1 hour (3600 seconds)
+            if users:
+                redis_client.set('all_users', str(users), ex=3600)
+                print("Fetching from database and setting cache: All Users")
+
             return users
         except psycopg2.Error as e:
             print("Error executing SQL query:", e)
@@ -184,13 +194,22 @@ def update_user(username, role):
                     # Update UserRoles table
                     cur.execute("UPDATE UserRoles SET roleid = %s WHERE userid = %s;", (roleid[0], userid[0]))
                     conn.commit()
-                # Invalidate cache
-                # redis_client.delete('all_users')
-                # redis_client.delete(f'users_by_role:{role}')
+                    
+                    # Invalidate cache entries that may be affected by this update
+                    redis_client.delete('all_users')
+                    # Also invalidate the cache for any specific role-related queries if they exist
+                    for cached_role in ['admin', 'user', 'developer']:  # example roles
+                        redis_client.delete(f'users_by_role:{cached_role}')
+
+                    # If caching individual user details, update or invalidate that as well
+                    redis_client.delete(f'user_details:{username}')
+                    
             close_db(conn, cur)
             return True
-    except:
+    except Exception as e:
+        print(f"Error updating user: {e}")
         return False
+
 
 
 def delete_user(username):
@@ -207,21 +226,25 @@ def delete_user(username):
                 # Delete user from Users table
                 cur.execute("DELETE FROM Users WHERE userid = %s;", (userid[0],))
                 conn.commit()
-            # Invalidate cache
-            # redis_client.delete('all_users')
+
+                # Invalidate related cache entries
+                redis_client.delete('all_users')
+                # If there are caches for user details or roles, those should be invalidated too
+                redis_client.delete(f'user_details:{username}')
+                # If users are cached by roles, invalidate those as well
+                redis_client.scan_iter("users_by_role:*", count=1000)  # Example pattern matching
+                for key in redis_client.scan_iter("users_by_role:*"):
+                    redis_client.delete(key)
+
             close_db(conn, cur)
             return True
-    except:
+    except Exception as e:
+        print(f"Error deleting user: {e}")
         return False
+
 
 def get_users_by_role(role):
     '''This function is used to fetch users by role.'''
-    # Check cache first
-    # cached_users = redis_client.get(f'users_by_role:{role}')
-    # if cached_users:
-    #     print(f"Fetching from cache: Users by role {role}")
-    #     return eval(cached_users.decode('utf-8'))
-
     # Fetch from database if not in cache
     conn, cur = connect_db()
     if conn and cur:

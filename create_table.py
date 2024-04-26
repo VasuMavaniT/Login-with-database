@@ -18,8 +18,8 @@ def create_tables():
         # Create the Users table
         cur.execute("""
         CREATE TABLE IF NOT EXISTS Users (
-            userid VARCHAR(20) PRIMARY KEY,
-            username VARCHAR(20) UNIQUE NOT NULL,
+            userid VARCHAR(40) PRIMARY KEY,
+            username VARCHAR(40) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL
         );
         """)
@@ -28,8 +28,8 @@ def create_tables():
         # Create the Roles table
         cur.execute("""
         CREATE TABLE IF NOT EXISTS Roles (
-            roleid VARCHAR(20) PRIMARY KEY,
-            rolename VARCHAR(20) UNIQUE NOT NULL
+            roleid VARCHAR(40) PRIMARY KEY,
+            rolename VARCHAR(40) UNIQUE NOT NULL
         );
         """)
         print("Table 'Roles' created successfully.")
@@ -37,8 +37,8 @@ def create_tables():
         # Create the UserRoles table
         cur.execute("""
         CREATE TABLE IF NOT EXISTS UserRoles (
-            userid VARCHAR(20) REFERENCES Users(userid),
-            roleid VARCHAR(20) REFERENCES Roles(roleid),
+            userid VARCHAR(40) REFERENCES Users(userid),
+            roleid VARCHAR(40) REFERENCES Roles(roleid),
             PRIMARY KEY (userid, roleid)
         );
         """)
