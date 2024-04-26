@@ -44,6 +44,19 @@
             display: flex;
             justify-content: center;
         }
+
+        .back-button {
+            display: block;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background-color: white;
+            color: black;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid #ccc; /* Thin grey border */
+            border-radius: 10px;
+            width: 50px;
+        }
     </style>
 </head>
 <body>
@@ -68,5 +81,6 @@
             </a>
         </div>
     </div>
+    <a href="{{ url_for('logout') }}" class="back-button">Logout</a>
 </body>
 </html>

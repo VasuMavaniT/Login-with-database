@@ -3,9 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <title>View Reports</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+        }
+
+        .report {
+            background: #e9e9e9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: white;
+            color: black;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1 class="page-title">View Reports</h1>
-    <img src="{{ url_for('static', filename='report.jpg') }}" alt="Example Image" />
+    <div class="container">
+        <h1>Reports - Welcome, {{ username }}!</h1>
+        <div class="report">
+            <h2>User Activity Report</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Last Login</th>
+                        <th>Activities</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>john_doe</td>
+                        <td>2023-10-05</td>
+                        <td>23</td>
+                    </tr>
+                    <tr>
+                        <td>jane_smith</td>
+                        <td>2023-10-04</td>
+                        <td>15</td>
+                    </tr>
+                    <tr>
+                        <td>alice_jones</td>
+                        <td>2023-10-03</td>
+                        <td>30</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="report">
+            <h2>System Performance</h2>
+            <p>CPU Usage: 65%</p>
+            <p>Memory Usage: 70%</p>
+            <p>Disk Usage: 55%</p>
+        </div>
+        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+    </div>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </body>
 </html>

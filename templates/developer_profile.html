@@ -3,9 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <title>Profile Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: white;
+            color: black;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1 class="page-title">Profile Management Page</h1>
-    <img src="{{ url_for('static', filename='profile.png') }}" alt="Example Image">
+    <div class="container">
+        <h1>Welcome, {{ username }}!</h1>
+        <h2>Profile Management</h2>
+        <form>
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="john_doe">
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" value="john@example.com">
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter new password">
+            </div>
+            <div>
+                <label for="timezone">Timezone:</label>
+                <select id="timezone" name="timezone">
+                    <option value="utc-5">UTC-5 Eastern Time</option>
+                    <option value="utc-6">UTC-6 Central Time</option>
+                    <option value="utc-7">UTC-7 Mountain Time</option>
+                    <option value="utc-8">UTC-8 Pacific Time</option>
+                </select>
+            </div>
+            <div>
+                <label for="language">Preferred Language:</label>
+                <select id="language" name="language">
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                </select>
+            </div>
+            <input type="submit" value="Update Profile">
+        </form>
+        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+    </div>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </body>
 </html>

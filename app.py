@@ -16,6 +16,15 @@ secret_key = secrets.token_hex(16)
 app = Flask(__name__)
 app.secret_key = secret_key
 
+# Session configuration
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_PERMANENT'] = False  # You can choose whether sessions are permanent
+app.config['SESSION_USE_SIGNER'] = True  # To prevent tampering
+app.config['SESSION_REDIS'] = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)  # Configure as needed
+
+# Initialize session
+Session(app)
+
 # Configure the OAuth client with Auth0 directly with hardcoded values
 oauth = OAuth(app)
 auth0 = oauth.register(
@@ -306,6 +315,7 @@ def login(registration_success=False):
     if request.method == 'POST':
         user = authenticate_user(request.form.get('username'), request.form.get('password'))
         if user:
+            redis_client['username'] = user[0]  # Store the username in the session
             return redirect(url_for('dashboard', username=user[0], role=user[1]))
         else:
             login_success = False
@@ -353,17 +363,20 @@ def dashboard():
 @app.route('/admin_profile')
 def admin_profile_management():
     '''This function is used to render the admin profile page.'''
-    return render_template('admin_profile.html')
+    username = redis_client.get('username')  
+    return render_template('admin_profile.html', username=username)
 
 @app.route('/admin_notifications')
 def admin_notification_management():
     '''This function is used to render the admin notifications page.'''
-    return render_template('admin_notifications.html')
+    username = redis_client.get('username')  
+    return render_template('admin_notifications.html', username=username)
 
 @app.route('/admin_logs')
 def admin_logs_management():
     '''This function is used to render the admin logs page.'''
-    return render_template('admin_logs.html')
+    username = redis_client.get('username')
+    return render_template('admin_logs.html', username=username)
 
 @app.route('/admin_manage', methods=['GET', 'POST'])
 def admin_manage():
@@ -372,7 +385,9 @@ def admin_manage():
     roles = ['admin', 'developer', 'user']  # Assuming these are your roles
     is_delete = False
     is_update = False
-
+    
+    username = redis_client.get('username')
+    
     try:
         users = get_all_users()  # Fetch all users for display
     except:
@@ -435,7 +450,7 @@ def admin_manage():
     message_category = session.pop("message_category", None)
 
     return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role,
-            is_update=is_update, message=message, message_category=message_category)
+            is_update=is_update, message=message, message_category=message_category, username=username)
 
 
 # Callback route
@@ -464,37 +479,44 @@ def callback():
 @app.route('/admin_settings')
 def admin_settings_management():
     '''This function is used to render the admin settings page.'''
-    return render_template('admin_settings.html')
+    username = redis_client.get('username')
+    return render_template('admin_settings.html', username=username)
 
 @app.route('/admin_reports')
 def admin_reports_viwers():
     '''This function is used to render the admin reports page.'''
-    return render_template('admin_reports.html')
+    username = redis_client.get('username')
+    return render_template('admin_reports.html', username=username)
 
 @app.route('/developer_profile')
 def developer_profile_management():
     '''This function is used to render the developer profile page.'''
-    return render_template('developer_profile.html')
+    username = redis_client.get('username')
+    return render_template('admin_profile.html', username=username)
 
 @app.route('/developer_notifications')
 def developer_notifications_management():
     '''This function is used to render the developer notifications page.'''
-    return render_template('developer_notifications.html')
+    username = redis_client.get('username')
+    return render_template('admin_notifications.html', username=username)
 
 @app.route('/developer_logs')
 def developer_logs_management():
     '''This function is used to render the developer logs page.'''
-    return render_template('developer_logs.html')
+    username = redis_client.get('username')
+    return render_template('admin_logs.html', username=username)
 
 @app.route('/user_profile')
 def user_profile_management():
     '''This function is used to render the user profile page.'''
-    return render_template('user_profile.html')
+    username = redis_client.get('username')
+    return render_template('admin_profile.html', username=username)
 
 @app.route('/user_notifications')
 def user_notifications_management():
     '''This function is used to render the user notifications page.'''
-    return render_template('user_notifications.html')
+    username = redis_client.get('username')
+    return render_template('admin_notifications.html', username=username)
 
 @app.route('/documentation')
 def documentation():
@@ -506,6 +528,14 @@ def show_all_users():
     '''This function is used to render the show all users page.'''
     users = get_all_users()
     return render_template('show_all_users.html', users=users)
+
+@app.route('/logout')
+def logout():
+    # Clear the session
+    redis_client.flushdb()
+    # Redirect to the home page or login page
+    return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8097)
