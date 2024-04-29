@@ -1,29 +1,66 @@
 import psycopg2
 
-# Connect to PostgreSQL server
-conn = psycopg2.connect(
-    dbname="mydatabase",  # Your database name
-    user="postgres",      # Default superuser
-    password="admin",     # Password for the superuser
-    host="localhost"      # Host where PostgreSQL is running
-)
+def connect_db():
+    conn = psycopg2.connect(
+        dbname="mydatabase",
+        user="postgres",
+        password="admin",
+        host="localhost"
+    )
+    conn.autocommit = True
+    cur = conn.cursor()
+    return conn, cur
 
-# Set autocommit to True
-conn.autocommit = True
+def read_data_from_userroles():
+    conn, cur = connect_db()
+    # Execute SELECT query to fetch all records
+    cur.execute("SELECT * FROM UserRoles;")
 
-# Create a cursor
-cur = conn.cursor()
+    # Fetch all records
+    records = cur.fetchall()
 
-# Execute SELECT query to fetch all records
-cur.execute("SELECT * FROM usersdata;")
+    # Print fetched records
+    for record in records:
+        print(record)
 
-# Fetch all records
-records = cur.fetchall()
+    # Close cursor and connection
+    cur.close()
+    conn.close()
 
-# Print fetched records
-for record in records:
-    print(record)
+def read_data_from_users():
+    conn, cur = connect_db()
+    # Execute SELECT query to fetch all records
+    cur.execute("SELECT * FROM Users;")
 
-# Close cursor and connection
-cur.close()
-conn.close()
+    # Fetch all records
+    records = cur.fetchall()
+
+    # Print fetched records
+    for record in records:
+        print(record)
+
+    # Close cursor and connection
+    cur.close()
+    conn.close()
+
+def read_data_from_roles():
+    conn, cur = connect_db()
+    # Execute SELECT query to fetch all records
+    cur.execute("SELECT * FROM Roles;")
+
+    # Fetch all records
+    records = cur.fetchall()
+
+    # Print fetched records
+    for record in records:
+        print(record)
+
+    # Close cursor and connection
+    cur.close()
+    conn.close()
+
+read_data_from_userroles()
+print("\n\n\n\n\n\n\n")
+read_data_from_users()
+print("\n\n\n\n\n\n\n")
+read_data_from_roles()

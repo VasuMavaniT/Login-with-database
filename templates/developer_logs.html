@@ -2,10 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Debug Logs</title>
+    <title>View Logs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .log-entry {
+            background: #e9e9e9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-family: monospace;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: white;
+            color: black;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1 class="page-title">Debug Logs</h1>
-    <img src="{{ url_for('static', filename='debug.jpg') }}" alt="Example Image" />
+    <div class="container">
+        <h1>View Logs - Welcome, {{ username }}!</h1>
+        <div class="log-entry">[INFO] User 'john_doe' logged in successfully at 2023-10-05 09:22:34.</div>
+        <div class="log-entry">[ERROR] Failed to send email notification to 'jane_doe@example.com' at 2023-10-05 09:30:00.</div>
+        <div class="log-entry">[DEBUG] Payment processing module executed with transaction id 123456 at 2023-10-05 09:45:10.</div>
+        <div class="log-entry">[WARNING] Low disk space on server 'server01' detected at 2023-10-05 10:00:22.</div>
+        <div class="log-entry">[INFO] New user 'sarah_connor' created at 2023-10-05 10:05:15.</div>
+        <!-- Add more log entries as needed -->
+        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+    </div>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </body>
 </html>

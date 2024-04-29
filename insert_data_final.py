@@ -6,43 +6,59 @@ def hash_password(password):
     """Hash a password for storing."""
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-def generate_random_data(role_counters):
-    roles = ['admin', 'developer', 'user']  # List of roles
-    role = random.choice(roles)  # Randomly select a role
-    num = role_counters[role]  # Get the current counter value for the selected role
-    
-    username = f"{role}{num}"
-    password = username  # For simplicity, making password same as username
-    hashed_password = hash_password(password)  # Hash the password
-    role_counters[role] += 1  # Increment the counter for the selected role
-    
-    return username, hashed_password.decode('utf-8'), role
-
-# Initialize counters for each role
-role_counters = {
-    'admin': 1,
-    'developer': 1,
-    'user': 1
-}
-
-def insert_initial_data():
-    # Connect to PostgreSQL server
+def connect_db():
+    """Establishes a database connection."""
     conn = psycopg2.connect(
         dbname="mydatabase",
         user="postgres",
-        password="postgres",
-        host="db",
-        port=5432
+        password="admin",
+        host="localhost"
     )
     conn.autocommit = True
+    return conn
+
+def initialize_roles(cur):
+    """Initializes roles in the Roles table and returns a mapping of role names to role IDs."""
+    roles = [('R1', 'admin'), ('R2', 'developer'), ('R3', 'user')]
+    cur.executemany("INSERT INTO Roles (roleid, rolename) VALUES (%s, %s) ON CONFLICT DO NOTHING;", roles)
+    return {name: rid for rid, name in roles}
+
+def insert_users_and_roles(cur, role_mapping):
+    """Inserts users and their roles into the database."""
+    role_counters = {role: 1 for role in role_mapping.values()}  # Initialize counters for each role
+
+    # Insert 100 random records into Users and UserRoles tables
+    for i in range(100):
+        role = random.choice(list(role_mapping.keys()))  # Randomly select a role
+        username = f"{role}{role_counters[role_mapping[role]]}"
+        userid = f"U{username}"
+        password = username  # For simplicity, making password same as username
+        hashed_password = hash_password(password)  # Hash the password
+
+        # Insert user
+        cur.execute("INSERT INTO Users (userid, username, password) VALUES (%s, %s, %s);",
+                    (userid, username, hashed_password.decode('utf-8')))
+
+        # Insert user role mapping
+        cur.execute("INSERT INTO UserRoles (userid, roleid) VALUES (%s, %s);",
+                    (userid, role_mapping[role]))
+
+        # Increment the counter for the selected role
+        role_counters[role_mapping[role]] += 1
+
+def insert_data():
+    conn = connect_db()
     cur = conn.cursor()
 
-    # Insert 100 random records into the table
-    for i in range(100):
-        username, hashed_password, role = generate_random_data(role_counters)
-        cur.execute("INSERT INTO usersdata (username, password, role) VALUES (%s, %s, %s);", (username, hashed_password, role))
+    # Initialize roles and get role mapping
+    role_mapping = initialize_roles(cur)
+
+    # Insert users and their roles
+    insert_users_and_roles(cur, role_mapping)
 
     # Close cursor and connection
     cur.close()
     conn.close()
-    print("Table 'usersdata' updated successfully with 100 random records inserted.")
+    print("Data insertion complete. Tables 'Users' and 'UserRoles' updated successfully.")
+
+insert_data()
