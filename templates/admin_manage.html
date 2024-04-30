@@ -7,20 +7,20 @@
         .dashboard {
             display: flex;
             justify-content: space-between;
-            max-width: 1000px; /* Adjust as needed */
+            max-width: 1050px; /* Adjust as needed */
             margin: 0 auto;
             padding: 20px;
             flex-wrap: wrap; /* Allow items to wrap to the next row */
         }
     
         .dashboard-item {
-            width: calc(25% - 20px); /* Adjust for spacing */
+            width: calc(25% - 5px); /* Adjust for spacing */
             margin-bottom: 20px; /* Adjust spacing between rows */
             background-color: #f0f0f0;
             border: 1px solid #ccc;
             padding: 20px;
             box-sizing: border-box;
-            height: 300px; /* Set a fixed height for all items */
+            height: 310px; /* Set a fixed height for all items */
             display: flex; /* Add this line to align items vertically */
             flex-direction: column; /* Add this line to align items vertically */
             justify-content: space-between; /* Add this line to align items vertically */
@@ -247,22 +247,22 @@
     <button id='view-user' onclick="location.href='/view_users'">View Users</button> -->
     <div class = "dashboard">
         <div class="dashboard-item create-new-user" onclick="showForm('createForm')" style="cursor: pointer;">
-            <img src="{{ url_for('static', filename='create-user.png') }}" id="create-new-user">
+            <img src="{{ url_for('static', filename='create-user.JPG') }}" id="create-new-user">
             <span>Create New User</span>
         </div>
         
         <div class="dashboard-item update-user" onclick="showForm('updateForm')" style="cursor: pointer;">
-            <img src="{{ url_for('static', filename='update-user.png') }}" id="update-user">
+            <img src="{{ url_for('static', filename='update-user.JPG') }}" id="update-user">
             <span>Update User</span>
         </div>
         
         <div class="dashboard-item delete-user" onclick="showForm('deleteForm')" style="cursor: pointer;">
-            <img src="{{ url_for('static', filename='delete-user.png') }}" id="delete-user">
+            <img src="{{ url_for('static', filename='delete-user.JPG') }}" id="delete-user">
             <span>Delete User</span>
         </div>
         
         <div class="dashboard-item view-user" onclick="location.href='/view_users'" style="cursor: pointer;">
-            <img src="{{ url_for('static', filename='view-users.png') }}" id="view-user">
+            <img src="{{ url_for('static', filename='view-user.JPG') }}" id="view-user">
             <span>View Users</span>
         </div>
     </div>

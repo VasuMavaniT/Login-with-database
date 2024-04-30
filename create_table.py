@@ -15,15 +15,15 @@ def create_tables():
     conn, cur = connect_db()
     
     try:
-        # Create the Users table
+        # Create the users table
         cur.execute("""
-        CREATE TABLE IF NOT EXISTS Users (
+        CREATE TABLE IF NOT EXISTS users (
             userid VARCHAR(40) PRIMARY KEY,
             username VARCHAR(40) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL
         );
         """)
-        print("Table 'Users' created successfully.")
+        print("Table 'users' created successfully.")
 
         # Create the Roles table
         cur.execute("""
@@ -37,7 +37,7 @@ def create_tables():
         # Create the UserRoles table
         cur.execute("""
         CREATE TABLE IF NOT EXISTS UserRoles (
-            userid VARCHAR(40) REFERENCES Users(userid),
+            userid VARCHAR(40) REFERENCES users(userid),
             roleid VARCHAR(40) REFERENCES Roles(roleid),
             PRIMARY KEY (userid, roleid)
         );

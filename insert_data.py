@@ -36,7 +36,7 @@ def insert_users_and_roles(cur, role_mapping):
         hashed_password = hash_password(password)  # Hash the password
 
         # Insert user
-        cur.execute("INSERT INTO Users (userid, username, password) VALUES (%s, %s, %s);",
+        cur.execute("INSERT INTO users (userid, username, password) VALUES (%s, %s, %s);",
                     (userid, username, hashed_password.decode('utf-8')))
 
         # Insert user role mapping
@@ -59,6 +59,6 @@ def insert_data():
     # Close cursor and connection
     cur.close()
     conn.close()
-    print("Data insertion complete. Tables 'Users' and 'UserRoles' updated successfully.")
+    print("Data insertion complete. Tables 'users' and 'UserRoles' updated successfully.")
 
 insert_data()

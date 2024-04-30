@@ -55,7 +55,7 @@ def connect_db():
     '''This function is used to connect to the database.'''
     try:
         conn = psycopg2.connect(
-            dbname="postgres",
+            dbname="mydatabase",
             user="postgres",
             password="admin",
             host="localhost"
@@ -84,10 +84,10 @@ def authenticate_user(username, password):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            # Query to join Users and UserRoles and Roles tables to get password and role
+            # Query to join users and UserRoles and Roles tables to get password and role
             cur.execute("""
             SELECT u.password, r.rolename 
-            FROM Users u
+            FROM users u
             JOIN UserRoles ur ON u.userid = ur.userid
             JOIN Roles r ON ur.roleid = r.roleid
             WHERE u.username = %s;
@@ -113,13 +113,13 @@ def create_new_user(username, password, role='user'):
         try:
             userid = "U" + username  # Generate userid by concatenating 'U' with the username
             # Check if user already exists
-            cur.execute("SELECT userid FROM Users WHERE userid = %s", (userid,))
+            cur.execute("SELECT userid FROM ssers WHERE userid = %s", (userid,))
             if cur.fetchone() is None:
                 # Hash password
                 hashed_password = hash_password(password).decode('utf-8')
                 
-                # Insert new user into Users table
-                cur.execute("INSERT INTO Users (userid, username, password) VALUES (%s, %s, %s);",
+                # Insert new user into users table
+                cur.execute("INSERT INTO users (userid, username, password) VALUES (%s, %s, %s);",
                             (userid, username, hashed_password))
 
                 # Get role id from Roles table
@@ -159,7 +159,7 @@ def get_all_users():
     # Try to fetch the cached data
     cached_users = redis_client.get('all_users')
     if cached_users:
-        print("Fetching from cache: All Users")
+        print("Fetching from cache: All users")
         return eval(cached_users)  # Deserialize and return the cached list of users
 
     # Fetch from the database if not in cache
@@ -169,7 +169,7 @@ def get_all_users():
             # Query to fetch all usernames and their roles
             cur.execute("""
                 SELECT u.username, r.rolename
-                FROM Users u
+                FROM users u
                 JOIN UserRoles ur ON u.userid = ur.userid
                 JOIN Roles r ON ur.roleid = r.roleid;
             """)
@@ -192,8 +192,8 @@ def update_user(username, role):
     try:
         conn, cur = connect_db()
         if conn and cur:
-            # Get user ID from Users table
-            cur.execute("SELECT userid FROM Users WHERE username = %s;", (username,))
+            # Get user ID from users table
+            cur.execute("SELECT userid FROM users WHERE username = %s;", (username,))
             userid = cur.fetchone()
             if userid:
                 # Get role ID from Roles table
@@ -226,14 +226,14 @@ def delete_user(username):
     try:
         conn, cur = connect_db()
         if conn and cur:
-            # Get user ID from Users table
-            cur.execute("SELECT userid FROM Users WHERE username = %s;", (username,))
+            # Get user ID from users table
+            cur.execute("SELECT userid FROM users WHERE username = %s;", (username,))
             userid = cur.fetchone()
             if userid:
                 # Delete from UserRoles table first
                 cur.execute("DELETE FROM UserRoles WHERE userid = %s;", (userid[0],))
-                # Delete user from Users table
-                cur.execute("DELETE FROM Users WHERE userid = %s;", (userid[0],))
+                # Delete user from users table
+                cur.execute("DELETE FROM users WHERE userid = %s;", (userid[0],))
                 conn.commit()
 
                 # Invalidate related cache entries
@@ -258,10 +258,10 @@ def get_users_by_role(role):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            # Join Users, UserRoles, and Roles tables to fetch usernames
+            # Join users, UserRoles, and Roles tables to fetch usernames
             cur.execute("""
                 SELECT u.username
-                FROM Users u
+                FROM users u
                 JOIN UserRoles ur ON u.userid = ur.userid
                 JOIN Roles r ON ur.roleid = r.roleid
                 WHERE r.rolename = %s;
@@ -286,7 +286,7 @@ def home():
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT COUNT(*) FROM usersdata")
+            cur.execute("SELECT COUNT(*) FROM users")
             if cur.fetchone()[0] == 0:
                 # Run data insertion in the background
                 from threading import Thread

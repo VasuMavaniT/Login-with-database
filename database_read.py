@@ -30,7 +30,7 @@ def read_data_from_userroles():
 def read_data_from_users():
     conn, cur = connect_db()
     # Execute SELECT query to fetch all records
-    cur.execute("SELECT * FROM Users;")
+    cur.execute("SELECT * FROM users;")
 
     # Fetch all records
     records = cur.fetchall()
