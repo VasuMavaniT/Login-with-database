@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.4/antd.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,26 +13,26 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
-            max-width: 700px; /* Adjust as needed */
+            max-width: 700px;
             margin: 0 auto;
             padding: 20px;
         }
 
         .dashboard-item {
-            width: calc(25% - 10px); /* Adjust for spacing */
-            margin-bottom: 20px; /* Adjust spacing between rows */
+            width: calc(25% - 10px);
+            margin-bottom: 20px;
             background-color: #f0f0f0;
             border: 1px solid #ccc;
-            padding: 30px; /* Increase padding to increase box size */
+            padding: 30px;
             box-sizing: border-box;
-            text-align: center; /* Align text content center */
-            font-size: 16px; /* Increase font size */
+            text-align: center;
+            font-size: 16px;
         }
 
         .dashboard-item img {
             display: block;
-            max-width: 80px; /* Increase max-width to increase image size */
-            margin: 0 auto 10px; /* Center the image horizontally */
+            max-width: 80px;
+            margin: 0 auto 10px;
         }
 
         .welcome-message {
@@ -40,22 +41,21 @@
         }
 
         .back-button {
-            display: block;
-            margin: 10px auto;
-            padding: 8px 16px;
-            background-color: white;
-            color: black;
+            display: inline-block;
+            padding: 6px 15px;
+            background-color: #1890ff; /* Ant Design primary blue */
+            color: white;
             text-align: center;
             text-decoration: none;
-            border: 1px solid #ccc; /* Thin grey border */
-            border-radius: 10px;
-            width: 50px;
+            border: 1px solid #1890ff;
+            border-radius: 4px;
+            cursor: pointer;
         }
 
         /* Adjust layout for small screens */
         @media (max-width: 600px) {
             .dashboard-item {
-                width: calc(50% - 10px); /* Adjust for spacing */
+                width: calc(50% - 10px);
             }
         }
     </style>
@@ -64,48 +64,48 @@
     <h1 class="welcome-message">Welcome, Admin!</h1>  
     <div class="dashboard">
         <div class="dashboard-item profile-management">
-            <a href="/admin_profile">
+            <a href="/admin_profile" class="ant-btn-link">
                 <img src="{{ url_for('static', filename='profile.png') }}" alt="Profile Image">
                 Profile Management
             </a>
         </div>
         <div class="dashboard-item view-notifications">
-            <a href="/admin_notifications">
+            <a href="/admin_notifications" class="ant-btn-link">
                 <img src="{{ url_for('static', filename='notification.png') }}" alt="Notification Image">
                 View Notifications
             </a>
         </div>
         <div class="dashboard-item debug-logs">
-            <a href="/admin_logs">
+            <a href="/admin_logs" class="ant-btn-link">
                 <img src="{{ url_for('static', filename='debug.png') }}" alt="Debug Image">
                 Debug Logs
             </a>
         </div>
         <div class="dashboard-item manage-users">
-            <a href="/admin_manage">
+            <a href="/admin_manage" class="ant-btn-link">
                 <img src="{{ url_for('static', filename='user.png') }}" alt="User Image">
                 Manage Users
             </a>
         </div>
         <div class="dashboard-item system-settings">
-            <a href="/admin_settings">
+            <a href="/admin_settings" class="ant-btn-link">
                 <img src="{{ url_for('static', filename='system.png') }}" alt="System Image">
                 System Settings
             </a>
         </div>
         <div class="dashboard-item view-reports">
-            <a href="/admin_reports">
+            <a href="/admin_reports" class="ant-btn-link">
                 <img src="{{ url_for('static', filename='report.png') }}" alt="Report Image">
                 View Reports
             </a>
         </div>
         <div class="dashboard-item documentation">
-            <a href="/documentation">
+            <a href="/documentation" class="ant-btn-link">
                 <img src="{{ url_for('static', filename='documentation.png') }}" alt="Documentation Image">
                 Documentation
             </a>
         </div>
     </div>
-    <a href="{{ url_for('logout') }}" class="back-button">Logout</a>
+    <a href="{{ url_for('logout') }}" class="back-button ant-btn ant-btn-primary">Logout</a>
 </body>
 </html>

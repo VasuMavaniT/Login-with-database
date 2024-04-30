@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>View Reports</title>
+    <!-- Include Ant Design CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.4/antd.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, sans-serif; /* Consider switching to Ant Design default 'Roboto', 'Helvetica Neue' for consistency */
             background: #f4f4f4;
             margin: 0;
             padding: 20px;
@@ -27,13 +29,14 @@
             border-radius: 5px;
         }
 
+        /* Apply Ant Design styles to table */
         table {
             width: 100%;
             border-collapse: collapse;
         }
 
         table, th, td {
-            border: 1px solid #ccc;
+            border: 1px solid #d9d9d9; /* Lighter border color for a more refined look */
         }
 
         th, td {
@@ -41,16 +44,22 @@
             text-align: left;
         }
 
+        /* Ant Design Button */
         .back-button {
             display: inline-block;
-            padding: 8px 16px;
-            background-color: white;
-            color: black;
+            padding: 6px 15px;
+            background-color: #1890ff; /* Ant Design primary blue */
+            color: white;
             text-align: center;
             text-decoration: none;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 20px;
+            border: 1px solid #1890ff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #40a9ff;
+            border-color: #40a9ff;
         }
     </style>
 </head>
@@ -59,15 +68,15 @@
         <h1>Reports - Welcome, {{ username }}!</h1>
         <div class="report">
             <h2>User Activity Report</h2>
-            <table>
-                <thead>
+            <table class="ant-table">
+                <thead class="ant-table-thead">
                     <tr>
                         <th>User</th>
                         <th>Last Login</th>
                         <th>Activities</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="ant-table-tbody">
                     <tr>
                         <td>john_doe</td>
                         <td>2023-10-05</td>
@@ -92,7 +101,7 @@
             <p>Memory Usage: 70%</p>
             <p>Disk Usage: 55%</p>
         </div>
-        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+        <a href="#" class="back-button ant-btn ant-btn-primary" onclick="goBack()">Go Back</a>
     </div>
     <script>
         function goBack() {
