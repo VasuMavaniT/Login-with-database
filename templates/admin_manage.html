@@ -128,6 +128,11 @@
             border-radius: 10px;
             margin-top: 20px;
         }
+
+        .page-title {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
    
     <script>
@@ -247,22 +252,22 @@
     <button id='view-user' onclick="location.href='/view_users'">View Users</button> -->
     <div class = "dashboard">
         <div class="dashboard-item create-new-user" onclick="showForm('createForm')" style="cursor: pointer;">
-            <img src="{{ url_for('static', filename='create-user.JPG') }}" id="create-new-user">
+            <img src="{{ url_for('static', filename='create-user.jpg') }}" id="create-new-user">
             <span>Create New User</span>
         </div>
         
         <div class="dashboard-item update-user" onclick="showForm('updateForm')" style="cursor: pointer;">
-            <img src="{{ url_for('static', filename='update-user.JPG') }}" id="update-user">
+            <img src="{{ url_for('static', filename='update-user.jpg') }}" id="update-user">
             <span>Update User</span>
         </div>
         
         <div class="dashboard-item delete-user" onclick="showForm('deleteForm')" style="cursor: pointer;">
-            <img src="{{ url_for('static', filename='delete-user.JPG') }}" id="delete-user">
+            <img src="{{ url_for('static', filename='delete-user.jpg') }}" id="delete-user">
             <span>Delete User</span>
         </div>
         
         <div class="dashboard-item view-user" onclick="location.href='/view_users'" style="cursor: pointer;">
-            <img src="{{ url_for('static', filename='view-user.JPG') }}" id="view-user">
+            <img src="{{ url_for('static', filename='view-user.jpg') }}" id="view-user">
             <span>View Users</span>
         </div>
     </div>

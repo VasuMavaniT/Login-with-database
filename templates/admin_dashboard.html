@@ -12,30 +12,36 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
-            max-width: 600px; /* Adjust as needed */
+            max-width: 700px; /* Adjust as needed */
             margin: 0 auto;
             padding: 20px;
         }
 
         .dashboard-item {
-            width: calc(33.33% - 20px); /* Adjust for spacing */
+            width: calc(25% - 10px); /* Adjust for spacing */
             margin-bottom: 20px; /* Adjust spacing between rows */
             background-color: #f0f0f0;
             border: 1px solid #ccc;
-            padding: 20px;
+            padding: 30px; /* Increase padding to increase box size */
             box-sizing: border-box;
+            text-align: center; /* Align text content center */
+            font-size: 16px; /* Increase font size */
         }
 
         .dashboard-item img {
             display: block;
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 10px;
+            max-width: 80px; /* Increase max-width to increase image size */
+            margin: 0 auto 10px; /* Center the image horizontally */
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-top: 20px;
         }
 
         .back-button {
             display: block;
-            margin: 10px 0;
+            margin: 10px auto;
             padding: 8px 16px;
             background-color: white;
             color: black;
@@ -45,6 +51,13 @@
             border-radius: 10px;
             width: 50px;
         }
+
+        /* Adjust layout for small screens */
+        @media (max-width: 600px) {
+            .dashboard-item {
+                width: calc(50% - 10px); /* Adjust for spacing */
+            }
+        }
     </style>
 </head>
 <body>
@@ -52,43 +65,43 @@
     <div class="dashboard">
         <div class="dashboard-item profile-management">
             <a href="/admin_profile">
-                <img src="{{ url_for('static', filename='profile.png') }}" alt="Example Image">
+                <img src="{{ url_for('static', filename='profile.png') }}" alt="Profile Image">
                 Profile Management
             </a>
         </div>
         <div class="dashboard-item view-notifications">
             <a href="/admin_notifications">
-                <img src="{{ url_for('static', filename='notification.png') }}" alt="Example Image">
+                <img src="{{ url_for('static', filename='notification.png') }}" alt="Notification Image">
                 View Notifications
             </a>
         </div>
         <div class="dashboard-item debug-logs">
             <a href="/admin_logs">
-                <img src="{{ url_for('static', filename='debug.jpg') }}" alt="Example Image">
+                <img src="{{ url_for('static', filename='debug.png') }}" alt="Debug Image">
                 Debug Logs
             </a>
         </div>
         <div class="dashboard-item manage-users">
             <a href="/admin_manage">
-                <img src="{{ url_for('static', filename='user.png') }}" alt="Example Image">
+                <img src="{{ url_for('static', filename='user.png') }}" alt="User Image">
                 Manage Users
             </a>
         </div>
         <div class="dashboard-item system-settings">
             <a href="/admin_settings">
-                <img src="{{ url_for('static', filename='system.jpg') }}" alt="Example Image">
+                <img src="{{ url_for('static', filename='system.png') }}" alt="System Image">
                 System Settings
             </a>
         </div>
         <div class="dashboard-item view-reports">
             <a href="/admin_reports">
-                <img src="{{ url_for('static', filename='report.jpg') }}" alt="Example Image">
+                <img src="{{ url_for('static', filename='report.png') }}" alt="Report Image">
                 View Reports
             </a>
         </div>
         <div class="dashboard-item documentation">
             <a href="/documentation">
-                <img src="{{ url_for('static', filename='documentation.png') }}" alt="Example Image">
+                <img src="{{ url_for('static', filename='documentation.png') }}" alt="Documentation Image">
                 Documentation
             </a>
         </div>
