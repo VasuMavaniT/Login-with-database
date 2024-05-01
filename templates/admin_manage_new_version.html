@@ -8,49 +8,40 @@
         .dashboard {
             display: flex;
             justify-content: space-between;
-            max-width: 1050px; /* Adjust as needed */
+            max-width: 1050px;
             margin: 0 auto;
             padding: 20px;
-            flex-wrap: wrap; /* Allow items to wrap to the next row */
+            flex-wrap: wrap;
         }
-    
+
         .dashboard-item {
-            width: calc(25% - 5px); /* Adjust for spacing */
-            margin-bottom: 20px; /* Adjust spacing between rows */
+            width: calc(25% - 5px);
+            margin-bottom: 20px;
             background-color: #f0f0f0;
             border: 1px solid #ccc;
             padding: 20px;
             box-sizing: border-box;
-            height: 310px; /* Set a fixed height for all items */
-            display: flex; /* Add this line to align items vertically */
-            flex-direction: column; /* Add this line to align items vertically */
-            justify-content: space-between; /* Add this line to align items vertically */
+            height: 310px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-    
+
         .dashboard-item img {
             display: block;
             max-width: 100%;
-            height: 80%; /* Set the image height to 80% of the container */
+            height: 80%;
             margin-bottom: 10px;
-            object-fit: cover; /* Ensure images cover the entire container */
-        }
-    
-        .dashboard-item span {
-            text-align: center; /* Center align the text */
+            object-fit: cover;
         }
 
-        input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
+        .dashboard-item span {
             text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 5px;
+        }
+
+        input[type="submit"], .ant-btn {
+            border-radius: 4px;
+            margin: 5px 0;
         }
 
         body {
@@ -58,87 +49,60 @@
         }
 
         h1 {
-            color: #333; /* Dark text color */
+            color: #333;
         }
 
         table, th, td {
             border-collapse: collapse;
             width: 100%;
-            border: 1px solid #ddd; /* Light gray border */
+            border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
 
         th {
-            background-color: #004080; /* Dark blue */
-            color: #fff; /* White text */
+            background-color: #004080;
+            color: #fff;
         }
 
         tr:nth-child(even) {
-            background-color: #f2f2f2; /* Light gray for even rows */
+            background-color: #f2f2f2;
         }
 
         tr:nth-child(odd) {
-            background-color: #cce0ff; /* Light blue for odd rows */
-        }
-
-        body {
-            font-family: Arial, sans-serif;
+            background-color: #cce0ff;
         }
 
         form {
             display: block;
-            margin-bottom: 20px; /* Add margin between forms */
+            margin-bottom: 20px;
         }
 
         label, select, input, button {
-            display: block; /* Display elements vertically */
-            margin-bottom: 10px; /* Add spacing between elements */
+            display: block;
+            margin-bottom: 10px;
         }
 
-        .back-button-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        span.error-message {
+        span.error-message, span.success-message {
             visibility: hidden;
             color: red;
-            margin-bottom: 10px; /* Add spacing below error messages */
+            margin-bottom: 10px;
         }
 
-        span.success-message {
-            visibility: hidden;
+        .success-message {
             color: green;
-            margin-bottom: 10px; /* Add spacing below success messages */
         }
 
-        .error {
-            color: #ff4500; /* Red-orange color for errors */
-            font-size: 0.875em;
-            margin-bottom: 1px;
-            margin-top: 1px;
-        }
-
-        .success
-        {
-            color: green;
-            font-size: 0.875em;
-            margin-bottom: 1px;
-            margin-top: 1px;
-        }
-        
         .container {
             display: flex;
             justify-content: center;
             align-items: center;
-          }
+        }
 
         .back-button {
             display: inline-block;
-            padding: 6px 15px;
-            background-color: #1890ff; /* Ant Design primary color */
+            padding: 8px 16px;
+            background-color: #1890ff;
             color: white;
             text-align: center;
             text-decoration: none;
@@ -157,7 +121,8 @@
             margin-top: 20px;
         }
     </style>
-       <script>
+
+    <script>
         function showForm(formId) {
             document.getElementById('createForm').style.display = 'none';
             document.getElementById('updateForm').style.display = 'none';
@@ -291,24 +256,24 @@
     
     {% if message %}
         <div class="{{ message_category }}">{{ message }}</div>
-        {% set message = None %}  <!-- Clear the message after displaying -->
+        {% set message = None %}
     {% endif %}
 
-
-    
-    <form id="createForm" class="ant-form" style="display:none" method="post" onsubmit="return validateCreateForm()">
+    <form id="createForm" class="ant-form" style="display:none;" method="post" onsubmit="return validateCreateForm()">
         <input type="hidden" name="action" value="create">
         <label>Username:</label>
         <input type="text" class="ant-input" name="new-username" id="new-username">
-        <span id="newusernameError" style="visibility: hidden; color: red;">Please enter a username.</span><br>
-        Password: <input type="password" class="ant-input" name="new-password" id="new-password">
-        <span id="newpasswordError" style="visibility: hidden; color: red;">Please enter a password.</span><br>
-        Role: <select name="new-role" id="new-role" class="ant-select">
-                <option value="user">Other User</option>
-                <option value="admin">Admin</option>
-                <option value="developer">Developer</option>
-              </select><br>
-        <input type="submit" value="Submit" id="new-submit" class="ant-btn ant-btn-primary new-submit">
+        <span id="newusernameError" class="ant-form-item-explain ant-form-item-explain-error" style="visibility: hidden;">Please enter a username.</span>
+        <label>Password:</label>
+        <input type="password" class="ant-input" name="new-password" id="new-password">
+        <span id="newpasswordError" class="ant-form-item-explain ant-form-item-explain-error" style="visibility: hidden;">Please enter a password.</span>
+        <label>Role:</label>
+        <select name="new-role" id="new-role" class="ant-select">
+            <option value="user">Other User</option>
+            <option value="admin">Admin</option>
+            <option value="developer">Developer</option>
+        </select>
+        <button type="submit" class="ant-btn ant-btn-primary">Submit</button>
     </form>
 
     <form id="updateForm" class="ant-form" style="display:none;" method="post">
@@ -320,7 +285,7 @@
             <option value="{{ role }}" {% if selected_role == role %} selected {% endif %}>{{ role }}</option>
             {% endfor %}
         </select>
-        <button type="button" onclick="submitRoleUpdateForm()" id="update-role-selection" class="ant-btn ant-btn-primary">Select Role</button>
+        <button type="button" onclick="submitRoleUpdateForm()" class="ant-btn ant-btn-primary">Select Role</button>
     </form>
 
     {% if is_update %}
@@ -333,7 +298,7 @@
             <option value="{{ user[0] }}">{{ user[0] }}</option>
             {% endfor %}
         </select>
-        <span class="error-message" id="usernameToUpdateError">Please select a user to update.</span>
+        <span id="usernameToUpdateError" class="ant-form-item-explain ant-form-item-explain-error">Please select a user to update.</span>
         <label for="roleToUpdate">Select New Role:</label>
         <select name="new_role" id="update_new_role" class="ant-select">
             <option value="">Select Role</option>
@@ -341,9 +306,9 @@
             <option value="{{ role }}" {% if selected_role == role %} selected {% endif %}>{{ role }}</option>
             {% endfor %}
         </select>
-        <span class="error-message" id="newRoleError">Please select a new role.</span>
-        <span class="error-message" id="sameNewRoleError">New role cannot be the same as the current role.</span>
-        <button type="submit" class="ant-btn ant-btn-primary" value="Submit" id="update-submit">
+        <span id="newRoleError" class="ant-form-item-explain ant-form-item-explain-error">Please select a new role.</span>
+        <span id="sameNewRoleError" class="ant-form-item-explain ant-form-item-explain-error">New role cannot be the same as the current role.</span>
+        <button type="submit" class="ant-btn ant-btn-primary">Submit</button>
         <button type="button" class="ant-btn ant-btn-link" onclick="location.href='/admin_manage'">Cancel</button>
     </form>
     {% endif %}
@@ -368,7 +333,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <button type="button" value="Delete Selected Users" class="ant-btn ant-btn-danger" onclick="submitDeleteForm()">
+        <button type="button" class="ant-btn ant-btn-danger" onclick="submitDeleteForm()">Delete Selected Users</button>
     </form>    
 
     <span id="delete-user-error" class="ant-form-item-explain ant-form-item-explain-error" style="visibility: hidden; color: red;">Please select at least one user to delete.</span>
@@ -386,6 +351,5 @@
         window.history.back();
     }
 </script>
-
 </body>
 </html>
