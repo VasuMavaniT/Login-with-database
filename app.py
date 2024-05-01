@@ -113,7 +113,7 @@ def create_new_user(username, password, role='user'):
         try:
             userid = "U" + username  # Generate userid by concatenating 'U' with the username
             # Check if user already exists
-            cur.execute("SELECT userid FROM ssers WHERE userid = %s", (userid,))
+            cur.execute("SELECT userid FROM users WHERE userid = %s", (userid,))
             if cur.fetchone() is None:
                 # Hash password
                 hashed_password = hash_password(password).decode('utf-8')
@@ -538,4 +538,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8097)
+    app.run(debug=True, port=8098)

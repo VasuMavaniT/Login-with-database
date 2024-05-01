@@ -8,33 +8,26 @@
         body, html {
             margin: 0;
             height: 100%;
-            font-family: Arial, sans-serif;
-            background: #013369; /* Dark blue background */
+            font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5; /* Light grey background */
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #FF8C00; /* Orange text color */
         }
 
         .tile {
             width: 100%;
-            max-width: 450px; /* Slightly wider */
+            max-width: 350px; /* More compact width */
             padding: 30px;
-            border-radius: 15px; /* Rounded edges */
-            background: #024e7c; /* A different shade of dark blue for contrast */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Subtle shadow */
+            border-radius: 8px; /* Moderately rounded corners for a modern look */
+            background: #ffffff; /* White background for the tile */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow */
             text-align: center;
         }
 
         h2 {
-            color: #FF8C00; /* Orange color for headings */
+            color: #5a5a5a; /* Soft black color for headings */
             margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: .5em;
-            color: #FF8C00; /* Orange labels */
         }
 
         input[type="text"],
@@ -42,62 +35,38 @@
         input[type="submit"],
         .register,
         .sso {
-            width: calc(100% - 40px); /* Adjust width to account for padding */
-            padding: 10px 20px; /* Increased padding */
+            width: 100%; /* Full width */
+            padding: 10px;
             margin-bottom: 15px;
-            border: 2px solid #FF8C00; /* Orange border */
-            border-radius: 10px;
+            border: 2px solid #007BFF; /* Sky blue border */
+            border-radius: 5px; /* Mildly rounded borders for inputs */
             background: transparent;
-            color: #FF8C00;
-            font-weight: bold;
+            color: #007BFF;
         }
 
         input[type="submit"],
         .register,
         .sso {
-            background: #FF8C00; /* Orange buttons */
-            color: #013369; /* Dark blue text on buttons */
+            background: #007BFF; /* Sky blue background for buttons */
+            color: #ffffff; /* White text */
+            font-weight: bold;
+            cursor: pointer;
         }
-
-        .logo {
-            max-width: 100px; /* Adjust the size as needed */
-            display: block;
-            margin: 0 auto 20px;
-            border-radius: 50%; /* This makes the image round */
-            width: 100px; /* Ensure the width and height are the same for a perfect circle */
-            height: 100px; /* Equal to the width to maintain aspect ratio */
-            object-fit: cover; /* Ensures the image covers the space without distorting */
-        }
-              
 
         input[type="submit"]:hover,
         .register:hover,
         .sso:hover {
-            background: #ffc042; /* Lighter orange on hover */
-            color: #fff;
+            background: #0056b3; /* Darker blue on hover */
         }
 
-        #loginForm input[type="username"] {
-            margin-top: 1px;
-        }   
-
-        #loginForm input[type="password"] {
-            margin-top: 0.001px; 
-            margin-bottom: 1px;
-        }        
-
-        .error {
-            color: #ff4500; /* Red-orange color for errors */
+        .error, .success {
+            color: #c00000; /* Red color for error messages */
             font-size: 0.875em;
-            margin-bottom: 1px;
-            margin-top: 1px;
+            margin-bottom: 1em;
         }
 
         .success {
-            color: #e2f107; /* Green color for success messages */
-            font-size: 0.875em;
-            margin-bottom: 1px;
-            margin-top: 1px;
+            color: #28a745; /* Green color for success messages */
         }
 
     </style>
@@ -108,23 +77,24 @@
 
         <h2>Login</h2>
         <form id="loginForm" method="post" onsubmit="return validateCreateForm()">
-            <p><input type="text" id="username" name="username" placeholder="Enter Username"></p>
-            <p class="error usernameError"></p> <!-- Error message for username -->
-            <p><input type="password" id="password" name="password" placeholder="Enter password"></p>
-            <p class="error passwordError"></p> <!-- Error message for password -->
-            <p><input type="submit" id="submit" name="submit" value="Submit"></p>
+        <input type="text" id="username" name="username" placeholder="Enter Username">
+            <div class="error usernameError"></div> <!-- Error message for username -->
+            <input type="password" id="password" name="password" placeholder="Enter password">
+            <div class="error passwordError"></div> <!-- Error message for password -->
+            <input type="submit" value="Submit">
         </form>
 
-        {% if not login_success %}
-        <span class="error">
-            Invalid credentials</span>
-        {% endif %}
+        <div class="error">
+            {% if not login_success %}
+                Invalid credentials
+            {% endif %}
+        </div>
 
-        {% if registration_success %}
-        <span class="success">
-            Registration successful. Please login into app. 
-        </span>
-        {% endif %}
+        <div class="success">
+            {% if registration_success %}
+                Registration successful. Please login into app. 
+            {% endif %}
+        </div>
 
         <!-- Register button -->
         <form action="/register">
@@ -135,37 +105,37 @@
         <form action="/login_using_sso">
             <input type="submit" class="sso" value="Login using SSO">
         </form>
-</div>
-    
-        <script>
-            function validateCreateForm()
-            {
-                document.getElementById('loginForm').addEventListener('submit', function(event) {
-                    var username = document.getElementById('username').value.trim();
-                    var password = document.getElementById('password').value.trim();
-                    var usernameError = document.querySelector('.usernameError');
-                    var passwordError = document.querySelector('.passwordError');
-                    var isValid = true;
-        
-                    if (username === '') {
-                        usernameError.textContent = 'Username is required.';
-                        isValid = false;
-                    } else {
-                        usernameError.textContent = ''; // Clear the error message
-                    }
-        
-                    if (password === '') {
-                        passwordError.textContent = 'Password is required.';
-                        isValid = false;
-                    } else {
-                        passwordError.textContent = ''; // Clear the error message
-                    }
-        
-                    if (!isValid) {
-                        event.preventDefault(); // Prevent form submission if validation fails
-                    }
-                });
+    </div>
+
+    <script>
+        function validateCreateForm()
+        {
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+            var username = document.getElementById('username').value.trim();
+            var password = document.getElementById('password').value.trim();
+            var usernameError = document.querySelector('.usernameError');
+            var passwordError = document.querySelector('.passwordError');
+            var isValid = true;
+
+            if (username === '') {
+                usernameError.textContent = 'Username is required.';
+                isValid = false;
+            } else {
+                usernameError.textContent = '';
             }
-        </script>
+
+            if (password === '') {
+                passwordError.textContent = 'Password is required.';
+                isValid = false;
+            } else {
+                passwordError.textContent = '';
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    }
+    </script>
 </body>
 </html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Roles</title>
+    <!-- Include Ant Design CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.4/antd.min.css">
+    <style>
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+    
+        .dashboard-item {
+            width: calc(25% - 5px);
+            margin-bottom: 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-sizing: border-box;
+            height: 310px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+    
+        .dashboard-item img {
+            display: block;
+            max-width: 100%;
+            height: 80%;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+    
+        .dashboard-item span {
+            text-align: center;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table, th, td {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #1890ff; /* Using Ant Design primary color for header */
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #e6f7ff;
+        }
+
+        form {
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        label, select, input, button {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .back-button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .back-button {
+            padding: 6px 15px;
+            background-color: #1890ff; /* Ant Design primary color */
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid #1890ff;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #40a9ff;
+            border-color: #40a9ff;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        function showForm(formId) {
+            document.getElementById('createForm').style.display = 'none';
+            document.getElementById('updateForm').style.display = 'none';
+            document.getElementById('deleteForm').style.display = 'none';
+            document.getElementById(formId).style.display = 'block';
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var messages = document.querySelectorAll('.success, .error');
+                messages.forEach(function(message) {
+                    message.style.display = 'none';
+                });
+            }, 3000);
+        });
+    </script>
+    <script>
+        function validateCreateForm() {
+            var username = document.getElementById('new-username').value;
+            var password = document.getElementById('new-password').value;
+            document.getElementById('newusernameError').style.visibility = 'hidden';
+            document.getElementById('newpasswordError').style.visibility = 'hidden';
+            if (username === "") {
+                document.getElementById('newusernameError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            else if (password == "") {
+                document.getElementById('newpasswordError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            document.getElementById('create-success').style.visibility = 'visible';
+            return true;
+        }
+    </script>
+    <script>
+        function submitRoleForm() {
+            var roleToDelete = document.getElementById('roleToDelete').value;
+            if (roleToDelete === "") {
+                document.getElementById('roleToDeleteError').style.visibility = 'visible';
+            } else {
+                document.getElementById('deleteForm').submit();
+            }
+        }
+    </script>
+    <script>
+        function submitDeleteForm() {
+            var checkboxes = document.querySelectorAll('input[name="usernames[]"]:checked');
+            if (checkboxes.length === 0) {
+                document.getElementById('delete-user-error').style.visibility = 'visible';
+                return false;
+            } else {
+                document.getElementById('deleteForm').submit();
+            }
+        }
+    </script>
+    <script>
+        function submitRoleUpdateForm() {
+            var roleToUpdate = document.getElementById('roleToUpdate').value;
+            if (roleToUpdate === "") {
+                document.getElementById('roleToUpdateError').style.visibility = 'visible';
+            } 
+            else {
+                document.getElementById('updateForm').submit();
+            }
+        }
+    </script>
+    <script>
+        function validateDeleteForm()
+        {
+            var username = document.getElementById('usernameToDelete').value;
+            if (username === "") {
+                document.getElementById('usernameToDeleteError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            document.getElementById('delete-success').style.visibility = 'visible';
+            return true;
+        }
+    </script>
+    <script>
+        function validateUpdateForm() {
+            var username = document.getElementById('usernameToUpdate').value;
+            var newRole = document.getElementById('update_new_role').value;
+            var roleToUpdate = document.getElementById('roleToUpdate').value;
+        
+            // Reset error messages
+            document.getElementById('usernameToUpdateError').style.visibility = 'hidden';
+            document.getElementById('newRoleError').style.visibility = 'hidden';
+        
+            // Check if username and new role are selected
+            if (username === "") {
+                document.getElementById('usernameToUpdateError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            if (newRole === "") {
+                document.getElementById('newRoleError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            if (roleToUpdate === newRole) {
+                document.getElementById('sameNewRoleError').style.visibility = 'visible';
+                return false; // Prevent form submission
+            }
+            document.getElementById('update-success').style.visibility = 'visible';
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <h1 class="page-title">User Management</h1>
+    <div class="dashboard">
+        <div class="dashboard-item create-new-user" onclick="showForm('createForm')">
+            <img src="{{ url_for('static', filename='create-user.jpg') }}">
+            <span>Create New User</span>
+        </div>
+        <div class="dashboard-item update-user" onclick="showForm('updateForm')">
+            <img src="{{ url_for('static', filename='update-user.jpg') }}">
+            <span>Update User</span>
+        </div>
+        <div class="dashboard-item delete-user" onclick="showForm('deleteForm')">
+            <img src="{{ url_for('static', filename='delete-user.jpg') }}">
+            <span>Delete User</span>
+        </div>
+        <div class="dashboard-item view-user" onclick="location.href='/view_users'">
+            <img src="{{ url_for('static', filename='view-user.jpg') }}">
+            <span>View Users</span>
+        </div>
+    </div>
+
+    {% if message %}
+        <div class="{{ message_category }}">{{ message }}</div>
+        {% set message = None %}  <!-- Clear the message after displaying -->
+    {% endif %}
+    
+    <form id="createForm" class="ant-form" style="display:none" method="post" onsubmit="return validateCreateForm()">
+        <label>Username:</label>
+        <input type="text" class="ant-input" name="new-username" id="new-username">
+        <label>Password:</label>
+        <input type="password" class="ant-input" name="new-password" id="new-password">
+        <label>Role:</label>
+        <select class="ant-select" name="new-role" id="new-role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+            <option value="developer">Developer</option>
+        </select>
+        <button type="submit" class="ant-btn ant-btn-primary">Submit</button>
+    </form>
+
+    <!-- Update Role Selection Form -->
+<form id="updateForm" class="ant-form" style="display:none;" method="post">
+    <input type="hidden" name="action" value="update">
+    <label for="roleToUpdate">Select Role to Update:</label>
+    <select name="role" id="roleToUpdate" class="ant-select">
+        <option value="">Select Role</option>
+        {% for role in roles %}
+        <option value="{{ role }}" {% if selected_role == role %} selected {% endif %}>{{ role }}</option>
+        {% endfor %}
+    </select>
+    <button type="button" onclick="submitRoleUpdateForm()" id="update-role-selection" class="ant-btn ant-btn-primary">Select Role</button>
+</form>
+
+<!-- Conditional Form for Updating User Details -->
+{% if is_update %}
+<form method="post" class="ant-form" style="display:block;" onsubmit="return validateUpdateForm()">
+    <input type="hidden" name="action" value="perform_update">
+    <label for="usernameToUpdate">Select User to Update:</label>
+    <select name="username" id="usernameToUpdate" class="ant-select">
+        <option value="">Select User</option>
+        {% for user in users %}
+        <option value="{{ user[0] }}">{{ user[0] }}</option>
+        {% endfor %}
+    </select>
+    <span class="error-message" id="usernameToUpdateError">Please select a user to update.</span>
+    
+    <label for="roleToUpdate">Select New Role:</label>
+    <select name="new_role" id="update_new_role" class="ant-select">
+        <option value="">Select Role</option>
+        {% for role in roles %}
+        <option value="{{ role }}" {% if selected_role == role %} selected {% endif %}>{{ role }}</option>
+        {% endfor %}
+    </select>
+    <span class="error-message" id="newRoleError">Please select a new role.</span>
+    <span class="error-message" id="sameNewRoleError">New role cannot be the same as the current role.</span>
+    
+    <button type="submit" class="ant-btn ant-btn-primary">Submit</button>
+    <button type="button" onclick="location.href='/admin_manage'" class="ant-btn ant-btn-link">Cancel</button>
+</form>
+{% endif %}
+
+<!-- Form for Deleting Users -->
+<form id="deleteForm" class="ant-form" style="display:none;" method="post">
+    <input type="hidden" name="action" value="delete">
+    <table class="ant-table">
+        <thead class="ant-table-thead">
+            <tr>
+                <th>Select</th>
+                <th>Username</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+            {% for user in users %}
+            <tr>
+                <td><input type="checkbox" name="usernames[]" value="{{ user[0] }}"></td>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[1] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="button" onclick="submitDeleteForm()" class="ant-btn ant-btn-danger">Delete Selected Users</button>
+</form>
+
+<!-- Error Messages -->
+<span id="delete-user-error" class="ant-form-item-explain ant-form-item-explain-error" style="display: none;">Please select at least one user to delete.</span>
+<span id="roleToUpdateError" class="ant-form-item-explain ant-form-item-explain-error" style="display: none;">Please select a role to update.</span>
+<span id="roleToDeleteError" class="ant-form-item-explain ant-form-item-explain-error" style="display: none;">Please select a role to delete.</span>
+<span id="usernameToUpdateError" class="ant-form-item-explain ant-form-item-explain-error" style="display: none;">Please select a user to update.</span>
+<span id="newRoleError" class="ant-form-item-explain ant-form-item-explain-error" style="display: none;">Please select a new role.</span>
+
+<!-- Success Message -->
+<span id="successMessage" class="ant-form-item-explain ant-form-item-explain-success" style="display: none;">Form submitted successfully!</span>
+
+    
+    
+
+    <div class="back-button-container">
+        <a href="#" class="back-button ant-btn ant-btn-primary" onclick="goBack()">Go Back</a>
+    </div>  
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
