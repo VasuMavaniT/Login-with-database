@@ -11,8 +11,8 @@ def connect_db():
     conn = psycopg2.connect(
         dbname="mydatabase",
         user="postgres",
-        password="admin",
-        host="localhost"
+        password="postgres",
+        host="db"
     )
     conn.autocommit = True
     return conn

@@ -25,6 +25,6 @@ EXPOSE 8097
 # Set environment variables used by the flask command
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
-
+# ENV FLASK_RUN_PORT={PORT}
 # Start the application using the flask run command
-CMD ["flask", "run", "--port=8097"]
+CMD ["flask", "run"]

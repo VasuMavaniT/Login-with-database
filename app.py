@@ -20,7 +20,7 @@ app.secret_key = secret_key
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False  # You can choose whether sessions are permanent
 app.config['SESSION_USE_SIGNER'] = True  # To prevent tampering
-app.config['SESSION_REDIS'] = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)  # Configure as needed
+app.config['SESSION_REDIS'] = redis.Redis(host='redis', port=6379, db=0, decode_responses=True)  # Configure as needed
 
 # Initialize session
 Session(app)
@@ -39,7 +39,7 @@ auth0 = oauth.register(
 )
 
 # Setup Redis
-redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+redis_client = redis.Redis(host='redis', port=6379, db=0, decode_responses=True)
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
@@ -55,10 +55,10 @@ def connect_db():
     '''This function is used to connect to the database.'''
     try:
         conn = psycopg2.connect(
-            dbname="postgres",
+            dbname="mydatabase",
             user="postgres",
-            password="admin",
-            host="localhost"
+            password="postgres",
+            host="db"
         )
         return conn, conn.cursor()
     except psycopg2.Error as e:
@@ -286,7 +286,7 @@ def home():
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT COUNT(*) FROM usersdata")
+            cur.execute("SELECT COUNT(*) FROM Users")
             if cur.fetchone()[0] == 0:
                 # Run data insertion in the background
                 from threading import Thread
@@ -538,4 +538,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8097)
+    port = int(os.environ.get('FLASK_RUN_PORT', 8097))
+    app.run(debug=True, port=port)

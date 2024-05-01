@@ -21,19 +21,40 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: usersdata; Type: TABLE; Schema: public; Owner: postgres
+-- Name: Users; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.usersdata (
-    username VARCHAR(50) PRIMARY KEY,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(20) NOT NULL
+CREATE TABLE public.Users (
+    userid VARCHAR(40) PRIMARY KEY,
+    username VARCHAR(40) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
 
+ALTER TABLE public.Users OWNER TO postgres;
 
-ALTER TABLE public.usersdata OWNER TO postgres;
+--
+-- Name: Roles; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.Roles (
+    roleid VARCHAR(40) PRIMARY KEY,
+    rolename VARCHAR(40) UNIQUE NOT NULL
+);
+
+ALTER TABLE public.Roles OWNER TO postgres;
+
+--
+-- Name: UserRoles; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.UserRoles (
+    userid VARCHAR(40) REFERENCES public.Users(userid),
+    roleid VARCHAR(40) REFERENCES public.Roles(roleid),
+    PRIMARY KEY (userid, roleid)
+);
+
+ALTER TABLE public.UserRoles OWNER TO postgres;
 
 --
 -- PostgreSQL database dump complete
 --
-
