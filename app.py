@@ -41,6 +41,7 @@ auth0 = oauth.register(
 # Setup Redis
 redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
+
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()])
@@ -385,6 +386,9 @@ def admin_manage():
     roles = ['admin', 'developer', 'user']  # Assuming these are your roles
     is_delete = False
     is_update = False
+    is_message = False
+    message_info = ""
+    message_category = ""
     
     username = redis_client.get('username')
     
@@ -399,14 +403,16 @@ def admin_manage():
             try:
                 check = create_new_user(request.form.get('new-username'), request.form.get('new-password'), request.form.get('new-role'))        
                 if check == True:
-                    session["message"] = "User created successfully"
-                    session["message_category"] = "success"
+                    is_message = True
+                    message_info = "User created successfully"
+                    message_category = "success"
                 else:
-                    session["message"] = "User already exists"
-                    session["message_category"] = "error"
-                    return redirect(url_for('admin_manage'))
+                    is_message = True
+                    message_info = "User already exists"
+                    message_category = "error"
+                    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
             except:
-                return redirect(url_for('admin_manage'))
+                return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
         elif action == 'update':
             try:
                 is_update = True
@@ -414,21 +420,23 @@ def admin_manage():
                 if selected_role:
                     users = get_users_by_role(selected_role)  # Fetch users of the selected role
             except:
-                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
+                return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
         elif action == 'perform_update':
             try:
                 username = request.form.get('username')
                 role = request.form.get('new_role') # Get the new role
                 if username and role:
                     if update_user(username, role):
-                        session["message"] = "User updated successfully"
-                        session["message_category"] = "success"
+                        is_message = True
+                        message_info = "User updated successfully"
+                        message_category = "success"
                     else:
-                        session["message"] = "User update failed"
-                        session["message_category"] = "error"
-                    return redirect(url_for('admin_manage'))
+                        is_message = True
+                        message_info = "User update failed"
+                        message_category = "error"
+                    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
             except:
-                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
+                return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
         elif action == 'delete':
             try:
                 users = get_all_users()  # Fetch all users for display
@@ -436,22 +444,19 @@ def admin_manage():
                 if usernames:
                     for username in usernames:
                         if delete_user(username):  # Perform deletion for each selected user
-                            session["message"] = "User(s) deleted successfully"
-                            session["message_category"] = "success"
+                            is_message = True
+                            message_info = "User deletion successful"
+                            message_category = "success"
                         else:
-                            session["message"] = "User deletion failed"
-                            session["message_category"] = "error"
-                    return redirect(url_for('admin_manage'))
+                            is_message = True
+                            message_info = "User deletion failed"
+                            message_category = "error"
+                    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
             except:
-                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
-
-    # Check if there is a message to display
-    message = session.pop("message", None)
-    message_category = session.pop("message_category", None)
-
-    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role,
-            is_update=is_update, message=message, message_category=message_category, username=username)
-
+                return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
+        return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
+    
+    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
 
 # Callback route
 @app.route('/callback')
