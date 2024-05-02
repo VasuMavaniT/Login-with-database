@@ -23,6 +23,7 @@
             background: #ffffff; /* White background for the tile */
             box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow */
             text-align: center;
+            box-sizing: border-box;
         }
 
         h2 {
@@ -37,11 +38,14 @@
         .sso {
             width: 100%; /* Full width */
             padding: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 15px auto;
+            margin: 10px auto;
             border: 2px solid #007BFF; /* Sky blue border */
             border-radius: 5px; /* Mildly rounded borders for inputs */
             background: transparent;
             color: #007BFF;
+            box-sizing: border-box; 
+            display: block;
         }
 
         input[type="submit"],
@@ -81,7 +85,7 @@
             <div class="error usernameError"></div> <!-- Error message for username -->
             <input type="password" id="password" name="password" placeholder="Enter password">
             <div class="error passwordError"></div> <!-- Error message for password -->
-            <input type="submit" value="Submit">
+            <input type="submit" value="Submit" class="ant-btn ant-btn-primary">
         </form>
 
         <div class="error">
@@ -98,12 +102,12 @@
 
         <!-- Register button -->
         <form action="/register">
-            <input type="submit" class="register" value="Register">
+            <input type="submit" class="register ant-btn ant-btn-primary" value="Register">
         </form>
 
         <!-- Login using SSO button -->
         <form action="/login_using_sso">
-            <input type="submit" class="sso" value="Login using SSO">
+            <input type="submit" class="sso ant-btn ant-btn-primary" value="Login using SSO">
         </form>
     </div>
 

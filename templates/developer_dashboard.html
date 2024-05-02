@@ -67,6 +67,19 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
+        .container {
+            display: flex;
+            justify-content: center; /* Center the contents horizontally */
+            align-items: center; /* Align items vertically */
+            margin-top: 20px; /* Adjust this value based on your layout */
+            width: 100%; /* Ensure the container takes full width to center the button effectively */
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -97,7 +110,7 @@
             </a>
         </div>
     </div>
-    <div class="back-button-container">
+    <div class="container">
         <a href="{{ url_for('logout') }}" class="back-button ant-btn ant-btn-primary">Logout</a>
     </div>
 </body>
