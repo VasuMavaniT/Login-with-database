@@ -58,6 +58,14 @@
                 width: calc(50% - 10px);
             }
         }
+
+        .container {
+            display: flex;
+            justify-content: center; /* Center the contents horizontally */
+            align-items: center; /* Align items vertically */
+            margin-top: 20px; /* Adjust this value based on your layout */
+            width: 100%; /* Ensure the container takes full width to center the button effectively */
+        }
     </style>
 </head>
 <body>
@@ -106,6 +114,8 @@
             </a>
         </div>
     </div>
-    <a href="{{ url_for('logout') }}" class="back-button ant-btn ant-btn-primary">Logout</a>
+    <div class="container">
+    <a href="#" class="back-button ant-btn ant-btn-primary" onclick="goBack()">Go Back</a>
+    </div>
 </body>
 </html>

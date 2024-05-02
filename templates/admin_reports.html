@@ -29,20 +29,6 @@
             border-radius: 5px;
         }
 
-        /* Apply Ant Design styles to table */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table, th, td {
-            border: 1px solid #d9d9d9; /* Lighter border color for a more refined look */
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
 
         /* Ant Design Button */
         .back-button {
@@ -60,6 +46,60 @@
         .back-button:hover {
             background-color: #40a9ff;
             border-color: #40a9ff;
+        }
+
+        
+        table, th, td {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #004080;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #cce0ff;
+        }
+
+        .ant-table thead th {
+            width: 33.33%;  /* Divides the width of the table equally among the three headers */
+        }
+
+        .ant-table tbody td {
+            width: 33.33%;  /* Ensures each data cell in the body also occupies a third of the table's width */
+            text-align: center; /* Optionally center the content of the cells */
+        }
+
+        /* Specific styling for the checkbox column for better alignment */
+        .ant-table tbody td:first-child, 
+        .ant-table thead th:first-child {
+            width: 20%;  /* You might want to give slightly less width to the checkbox column */
+            text-align: left;  /* Aligns checkboxes to the left */
+        }
+
+        .ant-table tbody td:nth-child(2), 
+        .ant-table thead th:nth-child(2),
+        .ant-table tbody td:nth-child(3), 
+        .ant-table thead th:nth-child(3) {
+            width: 40%;  /* Allocate more space to username and role columns */
+        }
+
+        .ant-table thead th {
+            text-align: center;
+            /* Set dark color for table head text */
+            color: #fff;
+            background-color: #2eb2e6;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
         }
     </style>
 </head>

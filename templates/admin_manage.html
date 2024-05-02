@@ -362,7 +362,7 @@
         {% set message = None %}
     {% endif %}
 
-    <form id="createForm" class="ant-form" style="display:none;" method="post" onsubmit="return validateCreateForm()">
+    <form id="createForm" class="ant-form" style="display: none; margin: 0 auto; width: 50%;" method="post" onsubmit="return validateCreateForm()">
         <input type="hidden" name="action" value="create">
         <label>Username:</label>
         <input type="text" class="ant-input fixed-width-input" name="new-username" id="new-username">
@@ -379,7 +379,7 @@
         <button type="submit" class="ant-btn ant-btn-primary">Submit</button>
     </form>
 
-    <form id="updateForm" class="ant-form" style="display:none;" method="post">
+    <form id="updateForm" class="ant-form" style="display: none; margin: 0 auto; width: 50%;" method="post">
         <input type="hidden" name="action" value="update">
         <label for="roleToUpdate">Select Role to Update:</label>
         <select name="role" id="roleToUpdate" class="ant-select">
@@ -392,7 +392,7 @@
     </form>
 
     {% if is_update %}
-    <form method="post" class="ant-form" style="display:block;" onsubmit="return validateUpdateForm()">
+    <form method="post" class="ant-form" style="display: block; margin: 0 auto; width: 50%;" onsubmit="return validateUpdateForm()">
         <input type="hidden" name="action" value="perform_update">
         <label for="usernameToUpdate">Select User to Update:</label>
         <select name="username" id="usernameToUpdate" class="ant-select">
