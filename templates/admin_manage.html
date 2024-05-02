@@ -17,6 +17,35 @@
             border: 1px solid #d9d9d9;
             border-radius: 4px;
         }
+
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1050px;
+            margin: 0 auto 20px auto; /* Adjust bottom margin to create appropriate space */
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center; /* Center the contents horizontally */
+            align-items: center; /* Align items vertically */
+            margin-top: 20px; /* Adjust this value based on your layout */
+            width: 100%; /* Ensure the container takes full width to center the button effectively */
+        }
+
+        .back-button {
+            padding: 8px 16px;
+            background-color: #1890ff;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid #1890ff;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
         
         .ant-select:hover {
             border-color: #40a9ff;
@@ -45,15 +74,6 @@
         .fixed-width-input {
             width: 250px; /* Set the width to 250px */
             background-color: #cef7f8;
-        }
-
-        .dashboard {
-            display: flex;
-            justify-content: space-between;
-            max-width: 1050px;
-            margin: 0 auto;
-            padding: 20px;
-            flex-wrap: wrap;
         }
 
         .dashboard-item {
@@ -157,24 +177,6 @@
 
         .success-message {
             color: green;
-        }
-
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .back-button {
-            display: inline-block;
-            padding: 8px 16px;
-            background-color: #1890ff;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border: 1px solid #1890ff;
-            border-radius: 2px;
-            cursor: pointer;
         }
 
         .back-button:hover {
@@ -350,6 +352,9 @@
             <img src="{{ url_for('static', filename='view-user.jpg') }}" id="view-user">
             <span>View Users</span>
         </div>
+        <div class="container">
+            <a href="#" class="back-button ant-btn ant-btn-primary" onclick="goBack()">Go Back</a>
+        </div>
     </div>
     
     {% if is_message %}
@@ -441,9 +446,7 @@
     <span id="newRoleError" class="ant-form-item-explain ant-form-item-explain-error" style="visibility: hidden; color: red;">Please select a new role.</span>
     <span id="sameNewRoleError" class="ant-form-item-explain ant-form-item-explain-error" style="visibility: hidden; color: red;">New role cannot be the same as the current role.</span>
 </body>
-<div class="container">
-    <a href="#" class="back-button ant-btn ant-btn-primary" onclick="goBack()">Go Back</a>
-</div>  
+  
 <script>
     function goBack() {
         window.history.back();
