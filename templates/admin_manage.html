@@ -5,6 +5,48 @@
     <title>Assign Roles</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.4/antd.min.css">
     <style>
+        .ant-select {
+            display: block;
+            width: 250px;
+            padding: 6px 12px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #050000;
+            background-color: #cef7f8;
+            background-position: right 10px center;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+        
+        .ant-select:hover {
+            border-color: #40a9ff;
+        }
+        
+        .ant-select:focus {
+            border-color: #40a9ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }      
+        
+        label {
+            font-family: 'Arial', sans-serif; /* You can choose a more appropriate font based on your design */
+            font-size: 16px;
+            font-weight: 600; /* Makes text slightly bolder */
+            color: #595959; /* Soft black for readability */
+            margin-bottom: 8px; /* Adds space below the label */
+            display: block; /* Makes the label take the full width of its container, helpful for alignment */
+            transition: color 0.3s ease; /* Smooth transition for hover effect */
+        }
+
+        label:hover {
+            color: #1890ff; /* Changes color on hover to match Ant Design primary color */
+        }
+
+
+        .fixed-width-input {
+            width: 250px; /* Set the width to 250px */
+            background-color: #cef7f8;
+        }
+
         .dashboard {
             display: flex;
             justify-content: space-between;
@@ -48,6 +90,30 @@
             font-family: Arial, sans-serif;
         }
 
+        .ant-form-item-explain {
+            display: block; /* Ensures the span takes up the full width of its container */
+            padding: 5px 10px;
+            border: 1px solid transparent; /* Provides a subtle border which we can color for errors or success */
+            border-radius: 4px;
+            margin-top: 5px; /* Adds a little space above the message */
+            font-size: 14px;
+        }
+
+        /* Specific styling for error messages */
+        .ant-form-item-explain-error, .error {
+            color: #ff4d4f; /* Ant Design's error color */
+            background-color: #fff1f0; /* Light red background */
+            border-color: #ffa39e; /* Soft red border */
+        }
+
+        /* Specific styling for success messages */
+        .ant-form-item-explain-success, .success {
+            color: #52c41a; /* Ant Design's success color */
+            background-color: #f6ffed; /* Light green background */
+            border-color: #b7eb8f; /* Soft green border */
+        }
+
+        
         h1 {
             color: #333;
         }
@@ -120,8 +186,40 @@
             text-align: center;
             margin-top: 20px;
         }
-    </style>
 
+        .ant-table thead th {
+            width: 33.33%;  /* Divides the width of the table equally among the three headers */
+        }
+
+        .ant-table tbody td {
+            width: 33.33%;  /* Ensures each data cell in the body also occupies a third of the table's width */
+            text-align: center; /* Optionally center the content of the cells */
+        }
+
+        /* Specific styling for the checkbox column for better alignment */
+        .ant-table tbody td:first-child, 
+        .ant-table thead th:first-child {
+            width: 20%;  /* You might want to give slightly less width to the checkbox column */
+            text-align: left;  /* Aligns checkboxes to the left */
+        }
+
+        .ant-table tbody td:nth-child(2), 
+        .ant-table thead th:nth-child(2),
+        .ant-table tbody td:nth-child(3), 
+        .ant-table thead th:nth-child(3) {
+            width: 40%;  /* Allocate more space to username and role columns */
+        }
+
+        .ant-table thead th {
+            text-align: center;
+            /* Set dark color for table head text */
+            color: #fff;
+            background-color: #2eb2e6;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+        }
+
+    </style>
     <script>
         function showForm(formId) {
             document.getElementById('createForm').style.display = 'none';
@@ -262,10 +360,10 @@
     <form id="createForm" class="ant-form" style="display:none;" method="post" onsubmit="return validateCreateForm()">
         <input type="hidden" name="action" value="create">
         <label>Username:</label>
-        <input type="text" class="ant-input" name="new-username" id="new-username">
+        <input type="text" class="ant-input fixed-width-input" name="new-username" id="new-username">
         <span id="newusernameError" class="ant-form-item-explain ant-form-item-explain-error" style="visibility: hidden;">Please enter a username.</span>
         <label>Password:</label>
-        <input type="password" class="ant-input" name="new-password" id="new-password">
+        <input type="password" class="ant-input fixed-width-input" name="new-password" id="new-password">
         <span id="newpasswordError" class="ant-form-item-explain ant-form-item-explain-error" style="visibility: hidden;">Please enter a password.</span>
         <label>Role:</label>
         <select name="new-role" id="new-role" class="ant-select">
