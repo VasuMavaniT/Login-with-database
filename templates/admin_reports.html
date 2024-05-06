@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>View Reports</title>
+    <!-- Include Ant Design CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.4/antd.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, sans-serif; /* Consider switching to Ant Design default 'Roboto', 'Helvetica Neue' for consistency */
             background: #f4f4f4;
             margin: 0;
             padding: 20px;
@@ -27,30 +29,77 @@
             border-radius: 5px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+
+        /* Ant Design Button */
+        .back-button {
+            display: inline-block;
+            padding: 6px 15px;
+            background-color: #1890ff; /* Ant Design primary blue */
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid #1890ff;
+            border-radius: 4px;
+            cursor: pointer;
         }
 
+        .back-button:hover {
+            background-color: #40a9ff;
+            border-color: #40a9ff;
+        }
+
+        
         table, th, td {
-            border: 1px solid #ccc;
-        }
-
-        th, td {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
 
-        .back-button {
-            display: inline-block;
-            padding: 8px 16px;
-            background-color: white;
-            color: black;
+        th {
+            background-color: #004080;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #cce0ff;
+        }
+
+        .ant-table thead th {
+            width: 33.33%;  /* Divides the width of the table equally among the three headers */
+        }
+
+        .ant-table tbody td {
+            width: 33.33%;  /* Ensures each data cell in the body also occupies a third of the table's width */
+            text-align: center; /* Optionally center the content of the cells */
+        }
+
+        /* Specific styling for the checkbox column for better alignment */
+        .ant-table tbody td:first-child, 
+        .ant-table thead th:first-child {
+            width: 20%;  /* You might want to give slightly less width to the checkbox column */
+            text-align: left;  /* Aligns checkboxes to the left */
+        }
+
+        .ant-table tbody td:nth-child(2), 
+        .ant-table thead th:nth-child(2),
+        .ant-table tbody td:nth-child(3), 
+        .ant-table thead th:nth-child(3) {
+            width: 40%;  /* Allocate more space to username and role columns */
+        }
+
+        .ant-table thead th {
             text-align: center;
-            text-decoration: none;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 20px;
+            /* Set dark color for table head text */
+            color: #fff;
+            background-color: #2eb2e6;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -59,15 +108,15 @@
         <h1>Reports - Welcome, {{ username }}!</h1>
         <div class="report">
             <h2>User Activity Report</h2>
-            <table>
-                <thead>
+            <table class="ant-table">
+                <thead class="ant-table-thead">
                     <tr>
                         <th>User</th>
                         <th>Last Login</th>
                         <th>Activities</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="ant-table-tbody">
                     <tr>
                         <td>john_doe</td>
                         <td>2023-10-05</td>
@@ -92,7 +141,7 @@
             <p>Memory Usage: 70%</p>
             <p>Disk Usage: 55%</p>
         </div>
-        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+        <a href="#" class="back-button ant-btn ant-btn-primary" onclick="goBack()">Go Back</a>
     </div>
     <script>
         function goBack() {

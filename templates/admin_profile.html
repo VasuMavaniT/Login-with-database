@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Profile Management</title>
+    <!-- Include Ant Design CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.4/antd.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,11 +27,15 @@
 
         label {
             font-weight: bold;
+            display: block; /* Added for Ant Design consistency */
+            margin-bottom: 8px; /* Added for Ant Design consistency */
         }
 
         input[type="text"],
         input[type="password"],
-        select {
+        select,
+        .ant-input, 
+        .ant-select-selector {
             width: 100%;
             padding: 8px;
             margin-top: 5px;
@@ -39,14 +45,14 @@
 
         .back-button {
             display: inline-block;
-            padding: 8px 16px;
-            background-color: white;
-            color: black;
+            padding: 6px 15px;
+            background-color: #1890ff; /* Ant Design primary blue */
+            color: white;
             text-align: center;
             text-decoration: none;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 20px;
+            border: 1px solid #1890ff;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -57,19 +63,19 @@
         <form>
             <div>
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" value="john_doe">
+                <input type="text" id="username" name="username" class="ant-input" value="john_doe">
             </div>
             <div>
                 <label for="email">Email:</label>
-                <input type="text" id="email" name="email" value="john@example.com">
+                <input type="text" id="email" name="email" class="ant-input" value="john@example.com">
             </div>
             <div>
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" placeholder="Enter new password">
+                <input type="password" id="password" name="password" class="ant-input" placeholder="Enter new password">
             </div>
             <div>
                 <label for="timezone">Timezone:</label>
-                <select id="timezone" name="timezone">
+                <select id="timezone" name="timezone" class="ant-select">
                     <option value="utc-5">UTC-5 Eastern Time</option>
                     <option value="utc-6">UTC-6 Central Time</option>
                     <option value="utc-7">UTC-7 Mountain Time</option>
@@ -78,16 +84,16 @@
             </div>
             <div>
                 <label for="language">Preferred Language:</label>
-                <select id="language" name="language">
+                <select id="language" name="language" class="ant-select">
                     <option value="English">English</option>
                     <option value="Spanish">Spanish</option>
                     <option value="French">French</option>
                     <option value="German">German</option>
                 </select>
             </div>
-            <input type="submit" value="Update Profile">
+            <input type="submit" value="Update Profile" class="ant-btn ant-btn-primary">
         </form>
-        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+        <a href="#" class="back-button ant-btn ant-btn-primary" onclick="goBack()">Go Back</a>
     </div>
     <script>
         function goBack() {

@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Debug Logs</title>
+    <!-- Include Ant Design CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.4/antd.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,27 +33,55 @@
 
         .back-button {
             display: inline-block;
-            padding: 8px 16px;
-            background-color: white;
-            color: black;
+            padding: 6px 15px;
+            background-color: #1890ff; /* Ant Design primary blue */
+            color: white;
             text-align: center;
             text-decoration: none;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 20px;
+            border: 1px solid #1890ff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .ant-btn:hover {
+            color: #40a9ff;
+            border-color: #40a9ff;
+        }
+
+        .error {
+            color: #ff4d4f; /* Ant Design's error color */
+            background-color: #fff1f0; /* Light red background */
+            border-color: #ffa39e; /* Soft red border */
+        }
+
+        .warning {
+            color: #faad14; /* Ant Design's warning color */
+            background-color: #fffbe6; /* Light yellow background */
+            border-color: #ffe58f; /* Soft yellow border */
+        }
+
+        .info {
+            color: #1890ff; /* Ant Design's primary color */
+            background-color: #e6f7ff; /* Light blue background */
+            border-color: #91d5ff; /* Soft blue border */
+        }
+
+        .debug {
+            color: #52c41a; /* Ant Design's success color */
+            background-color: #f6ffed; /* Light green background */
+            border-color: #b7eb8f; /* Soft green border */
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Debug Logs - Welcome, {{ username }}!</h1>
-        <div class="log-entry">[INFO] User 'john_doe' logged in successfully at 2023-10-05 09:22:34.</div>
-        <div class="log-entry">[ERROR] Failed to send email notification to 'jane_doe@example.com' at 2023-10-05 09:30:00.</div>
-        <div class="log-entry">[DEBUG] Payment processing module executed with transaction id 123456 at 2023-10-05 09:45:10.</div>
-        <div class="log-entry">[WARNING] Low disk space on server 'server01' detected at 2023-10-05 10:00:22.</div>
-        <div class="log-entry">[INFO] New user 'sarah_connor' created at 2023-10-05 10:05:15.</div>
-        <!-- Add more log entries as needed -->
-        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+        <div class="ant-alert ant-alert-info info">[INFO] User 'john_doe' logged in successfully at 2023-10-05 09:22:34.</div>
+        <div class="ant-alert ant-alert-info error">[ERROR] Failed to send email notification to 'jane_doe@example.com' at 2023-10-05 09:30:00.</div>
+        <div class="ant-alert ant-alert-info debug">[DEBUG] Payment processing module executed with transaction id 123456 at 2023-10-05 09:45:10.</div>
+        <div class="ant-alert ant-alert-info warning">[WARNING] Low disk space on server 'server01' detected at 2023-10-05 10:00:22.</div>
+        <div class="ant-alert ant-alert-info info">[INFO] New user 'sarah_connor' created at 2023-10-05 10:05:15.</div>
+        <a href="#" class="back-button ant-btn ant-btn-primary" onclick="goBack()">Go Back</a>
     </div>
     <script>
         function goBack() {

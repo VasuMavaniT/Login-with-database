@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>View Notifications</title>
+    <!-- Ant Design CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.4/antd.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,24 +21,16 @@
             margin: 20px auto;
         }
 
-        .notification {
-            background: #e9e9e9;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-
         .back-button {
             display: inline-block;
-            padding: 8px 16px;
-            background-color: white;
-            color: black;
+            padding: 6px 15px;
+            background-color: #1890ff; /* Ant Design primary blue */
+            color: white;
             text-align: center;
             text-decoration: none;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 20px;
+            border: 1px solid #1890ff;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -44,11 +38,17 @@
     <div class="container">
         <h1>Welcome, {{ username }}!</h1>
         <h2 class="page-title">View Notifications</h2>
-        <div class="notification">Notification 1: Lorem ipsum dolor sit amet...</div>
-        <div class="notification">Notification 2: Consectetur adipiscing elit...</div>
-        <div class="notification">Notification 3: Sed do eiusmod tempor incididunt...</div>
-        <!-- Add more notifications as needed -->
-        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+        <!-- Using Ant Design classes for the notifications -->
+        <div class="ant-alert ant-alert-info" style="margin-bottom: 10px;">
+            Notification 1: Lorem ipsum dolor sit amet...
+        </div>
+        <div class="ant-alert ant-alert-info" style="margin-bottom: 10px;">
+            Notification 2: Consectetur adipiscing elit...
+        </div>
+        <div class="ant-alert ant-alert-info" style="margin-bottom: 10px;">
+            Notification 3: Sed do eiusmod tempor incididunt...
+        </div>
+        <button class="back-button ant-btn ant-btn-primary" onclick="goBack()">Go Back</button>
     </div>
     <script>
         function goBack() {

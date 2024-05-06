@@ -41,6 +41,7 @@ auth0 = oauth.register(
 # Setup Redis
 redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
+
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()])
@@ -55,7 +56,7 @@ def connect_db():
     '''This function is used to connect to the database.'''
     try:
         conn = psycopg2.connect(
-            dbname="postgres",
+            dbname="mydatabase",
             user="postgres",
             password="admin",
             host="localhost"
@@ -84,10 +85,10 @@ def authenticate_user(username, password):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            # Query to join Users and UserRoles and Roles tables to get password and role
+            # Query to join users and UserRoles and Roles tables to get password and role
             cur.execute("""
             SELECT u.password, r.rolename 
-            FROM Users u
+            FROM users u
             JOIN UserRoles ur ON u.userid = ur.userid
             JOIN Roles r ON ur.roleid = r.roleid
             WHERE u.username = %s;
@@ -113,13 +114,13 @@ def create_new_user(username, password, role='user'):
         try:
             userid = "U" + username  # Generate userid by concatenating 'U' with the username
             # Check if user already exists
-            cur.execute("SELECT userid FROM Users WHERE userid = %s", (userid,))
+            cur.execute("SELECT userid FROM users WHERE userid = %s", (userid,))
             if cur.fetchone() is None:
                 # Hash password
                 hashed_password = hash_password(password).decode('utf-8')
                 
-                # Insert new user into Users table
-                cur.execute("INSERT INTO Users (userid, username, password) VALUES (%s, %s, %s);",
+                # Insert new user into users table
+                cur.execute("INSERT INTO users (userid, username, password) VALUES (%s, %s, %s);",
                             (userid, username, hashed_password))
 
                 # Get role id from Roles table
@@ -159,7 +160,7 @@ def get_all_users():
     # Try to fetch the cached data
     cached_users = redis_client.get('all_users')
     if cached_users:
-        print("Fetching from cache: All Users")
+        print("Fetching from cache: All users")
         return eval(cached_users)  # Deserialize and return the cached list of users
 
     # Fetch from the database if not in cache
@@ -169,7 +170,7 @@ def get_all_users():
             # Query to fetch all usernames and their roles
             cur.execute("""
                 SELECT u.username, r.rolename
-                FROM Users u
+                FROM users u
                 JOIN UserRoles ur ON u.userid = ur.userid
                 JOIN Roles r ON ur.roleid = r.roleid;
             """)
@@ -192,8 +193,8 @@ def update_user(username, role):
     try:
         conn, cur = connect_db()
         if conn and cur:
-            # Get user ID from Users table
-            cur.execute("SELECT userid FROM Users WHERE username = %s;", (username,))
+            # Get user ID from users table
+            cur.execute("SELECT userid FROM users WHERE username = %s;", (username,))
             userid = cur.fetchone()
             if userid:
                 # Get role ID from Roles table
@@ -226,14 +227,14 @@ def delete_user(username):
     try:
         conn, cur = connect_db()
         if conn and cur:
-            # Get user ID from Users table
-            cur.execute("SELECT userid FROM Users WHERE username = %s;", (username,))
+            # Get user ID from users table
+            cur.execute("SELECT userid FROM users WHERE username = %s;", (username,))
             userid = cur.fetchone()
             if userid:
                 # Delete from UserRoles table first
                 cur.execute("DELETE FROM UserRoles WHERE userid = %s;", (userid[0],))
-                # Delete user from Users table
-                cur.execute("DELETE FROM Users WHERE userid = %s;", (userid[0],))
+                # Delete user from users table
+                cur.execute("DELETE FROM users WHERE userid = %s;", (userid[0],))
                 conn.commit()
 
                 # Invalidate related cache entries
@@ -258,10 +259,10 @@ def get_users_by_role(role):
     conn, cur = connect_db()
     if conn and cur:
         try:
-            # Join Users, UserRoles, and Roles tables to fetch usernames
+            # Join users, UserRoles, and Roles tables to fetch usernames
             cur.execute("""
                 SELECT u.username
-                FROM Users u
+                FROM users u
                 JOIN UserRoles ur ON u.userid = ur.userid
                 JOIN Roles r ON ur.roleid = r.roleid
                 WHERE r.rolename = %s;
@@ -286,7 +287,7 @@ def home():
     conn, cur = connect_db()
     if conn and cur:
         try:
-            cur.execute("SELECT COUNT(*) FROM usersdata")
+            cur.execute("SELECT COUNT(*) FROM users")
             if cur.fetchone()[0] == 0:
                 # Run data insertion in the background
                 from threading import Thread
@@ -385,6 +386,9 @@ def admin_manage():
     roles = ['admin', 'developer', 'user']  # Assuming these are your roles
     is_delete = False
     is_update = False
+    is_message = False
+    message_info = ""
+    message_category = ""
     
     username = redis_client.get('username')
     
@@ -399,14 +403,16 @@ def admin_manage():
             try:
                 check = create_new_user(request.form.get('new-username'), request.form.get('new-password'), request.form.get('new-role'))        
                 if check == True:
-                    session["message"] = "User created successfully"
-                    session["message_category"] = "success"
+                    is_message = True
+                    message_info = "User created successfully"
+                    message_category = "success"
                 else:
-                    session["message"] = "User already exists"
-                    session["message_category"] = "error"
-                    return redirect(url_for('admin_manage'))
+                    is_message = True
+                    message_info = "User already exists"
+                    message_category = "error"
+                    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
             except:
-                return redirect(url_for('admin_manage'))
+                return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
         elif action == 'update':
             try:
                 is_update = True
@@ -414,21 +420,23 @@ def admin_manage():
                 if selected_role:
                     users = get_users_by_role(selected_role)  # Fetch users of the selected role
             except:
-                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
+                return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
         elif action == 'perform_update':
             try:
                 username = request.form.get('username')
                 role = request.form.get('new_role') # Get the new role
                 if username and role:
                     if update_user(username, role):
-                        session["message"] = "User updated successfully"
-                        session["message_category"] = "success"
+                        is_message = True
+                        message_info = "User updated successfully"
+                        message_category = "success"
                     else:
-                        session["message"] = "User update failed"
-                        session["message_category"] = "error"
-                    return redirect(url_for('admin_manage'))
+                        is_message = True
+                        message_info = "User update failed"
+                        message_category = "error"
+                    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
             except:
-                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
+                return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
         elif action == 'delete':
             try:
                 users = get_all_users()  # Fetch all users for display
@@ -436,22 +444,19 @@ def admin_manage():
                 if usernames:
                     for username in usernames:
                         if delete_user(username):  # Perform deletion for each selected user
-                            session["message"] = "User(s) deleted successfully"
-                            session["message_category"] = "success"
+                            is_message = True
+                            message_info = "User deletion successful"
+                            message_category = "success"
                         else:
-                            session["message"] = "User deletion failed"
-                            session["message_category"] = "error"
-                    return redirect(url_for('admin_manage'))
+                            is_message = True
+                            message_info = "User deletion failed"
+                            message_category = "error"
+                    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
             except:
-                render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update)
-
-    # Check if there is a message to display
-    message = session.pop("message", None)
-    message_category = session.pop("message_category", None)
-
-    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role,
-            is_update=is_update, message=message, message_category=message_category, username=username)
-
+                return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
+        return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
+    
+    return render_template('admin_manage.html', users=users, roles=roles, selected_role=selected_role, is_delete=is_delete, is_update=is_update, is_message=is_message, message_info=message_info, message_category=message_category)
 
 # Callback route
 @app.route('/callback')

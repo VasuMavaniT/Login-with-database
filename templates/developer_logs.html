@@ -40,16 +40,39 @@
             border-radius: 5px;
             margin-top: 20px;
         }
+        .error {
+            color: #ff4d4f; /* Ant Design's error color */
+            background-color: #fff1f0; /* Light red background */
+            border-color: #ffa39e; /* Soft red border */
+        }
+
+        .warning {
+            color: #faad14; /* Ant Design's warning color */
+            background-color: #fffbe6; /* Light yellow background */
+            border-color: #ffe58f; /* Soft yellow border */
+        }
+
+        .info {
+            color: #1890ff; /* Ant Design's primary color */
+            background-color: #e6f7ff; /* Light blue background */
+            border-color: #91d5ff; /* Soft blue border */
+        }
+
+        .debug {
+            color: #52c41a; /* Ant Design's success color */
+            background-color: #f6ffed; /* Light green background */
+            border-color: #b7eb8f; /* Soft green border */
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>View Logs - Welcome, {{ username }}!</h1>
-        <div class="log-entry">[INFO] User 'john_doe' logged in successfully at 2023-10-05 09:22:34.</div>
-        <div class="log-entry">[ERROR] Failed to send email notification to 'jane_doe@example.com' at 2023-10-05 09:30:00.</div>
-        <div class="log-entry">[DEBUG] Payment processing module executed with transaction id 123456 at 2023-10-05 09:45:10.</div>
-        <div class="log-entry">[WARNING] Low disk space on server 'server01' detected at 2023-10-05 10:00:22.</div>
-        <div class="log-entry">[INFO] New user 'sarah_connor' created at 2023-10-05 10:05:15.</div>
+        <div class="log-entry info">[INFO] User 'john_doe' logged in successfully at 2023-10-05 09:22:34.</div>
+        <div class="log-entry error">[ERROR] Failed to send email notification to 'jane_doe@example.com' at 2023-10-05 09:30:00.</div>
+        <div class="log-entry debug">[DEBUG] Payment processing module executed with transaction id 123456 at 2023-10-05 09:45:10.</div>
+        <div class="log-entry warning">[WARNING] Low disk space on server 'server01' detected at 2023-10-05 10:00:22.</div>
+        <div class="log-entry info">[INFO] New user 'sarah_connor' created at 2023-10-05 10:05:15.</div>
         <!-- Add more log entries as needed -->
         <a href="#" class="back-button" onclick="goBack()">Go Back</a>
     </div>

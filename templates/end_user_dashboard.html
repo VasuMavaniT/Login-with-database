@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.4/antd.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,17 +46,35 @@
             justify-content: center;
         }
 
+        .back-button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
         .back-button {
-            display: block;
-            margin: 10px 0;
-            padding: 8px 16px;
-            background-color: white;
-            color: black;
+            display: inline-block;
+            padding: 6px 15px;
+            background-color: #1890ff; /* Ant Design primary blue */
+            color: white;
             text-align: center;
             text-decoration: none;
-            border: 1px solid #ccc; /* Thin grey border */
-            border-radius: 10px;
-            width: 50px;
+            border: 1px solid #1890ff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center; /* Center the contents horizontally */
+            align-items: center; /* Align items vertically */
+            margin-top: 20px; /* Adjust this value based on your layout */
+            width: 100%; /* Ensure the container takes full width to center the button effectively */
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -81,6 +100,8 @@
             </a>
         </div>
     </div>
-    <a href="{{ url_for('logout') }}" class="back-button">Logout</a>
+    <div class="container">
+        <a href="{{ url_for('logout') }}" class="back-button ant-btn ant-btn-primary">Logout</a>
+    </div>
 </body>
 </html>

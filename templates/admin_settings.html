@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Settings</title>
+    <!-- Include Ant Design CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.17.0-alpha.0/antd.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,15 +30,14 @@
         }
 
         .back-button {
-            display: inline-block;
             padding: 8px 16px;
-            background-color: white;
-            color: black;
+            background-color: #1890ff;
+            color: white;
             text-align: center;
             text-decoration: none;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 20px;
+            border: 1px solid #1890ff;
+            border-radius: 2px;
+            cursor: pointer;
         }
 
         input[type="checkbox"], input[type="radio"] {
@@ -48,6 +49,7 @@
             margin: 5px 0;
         }
 
+        /* Ant Design button classes added */
         input[type="submit"] {
             background-color: #4CAF50;
             color: white;
@@ -59,6 +61,11 @@
             font-size: 16px;
             margin: 4px 2px;
             cursor: pointer;
+            border-radius: 5px;
+        }
+
+        /* Add Ant Design classes to maintain original look */
+        .ant-btn {
             border-radius: 5px;
         }
     </style>
@@ -73,7 +80,7 @@
             </div>
             <div class="setting">
                 <label for="language">Language:</label>
-                <select id="language" name="language">
+                <select id="language" name="language" class="ant-select">
                     <option value="English">English</option>
                     <option value="Spanish">Spanish</option>
                     <option value="French">French</option>
@@ -83,9 +90,9 @@
                 <label><input type="radio" name="privacy" value="public" checked> Public profile</label>
                 <label><input type="radio" name="privacy" value="private"> Private profile</label>
             </div>
-            <input type="submit" value="Save Changes">
+            <input type="submit" value="Save Changes" class="ant-btn ant-btn-primary">
         </form>
-        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+            <a href="#" class="back-button ant-btn ant-btn-primary" onclick="goBack()">Go Back</a>
     </div>
     <script>
         function goBack() {
