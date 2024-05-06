@@ -198,6 +198,27 @@
             text-align: center; /* Optionally center the content of the cells */
         }
 
+        /* Styles for the Delete Form container */
+        #deleteForm {
+            width: 75%; /* Set the width to 75% of the page */
+            margin: 0 auto; /* Center the form horizontally */
+            display: none; /* Start with the form hidden */
+            padding: 20px 0; /* Top and bottom padding */
+        }
+
+        /* Styles for the Delete button within the Delete Form */
+        #deleteForm button.ant-btn-danger {
+            margin-left: 10px; /* Left margin for padding */
+        }
+
+        /* Styles to adjust the table width and padding */
+        .ant-table {
+            width: 100%; /* Full width of its container */
+            padding: 0 15px; /* Padding on both sides */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+
         /* Specific styling for the checkbox column for better alignment */
         .ant-table tbody td:first-child, 
         .ant-table thead th:first-child {
@@ -414,8 +435,10 @@
     </form>
     {% endif %}
     
-    <form id="deleteForm" class="ant-form" style="display:none;" method="post">
+    <!-- Delete Form Setup -->
+    <form id="deleteForm" class="ant-form" method="post" style="display: none;"> <!-- Initial style is set to none -->
         <input type="hidden" name="action" value="delete">
+        <button type="button" class="ant-btn ant-btn-danger" onclick="submitDeleteForm()">Delete Selected Users</button>
         <table class="ant-table">
             <thead class="ant-table-thead">
                 <tr>
@@ -429,13 +452,13 @@
                 <tr>
                     <td><input type="checkbox" name="usernames[]" value="{{ user[0] }}"></td>
                     <td>{{ user[0] }}</td>
-                    <td>{{ user[1] }}</td>
+                    <td>{{ user[1] }}"></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <button type="button" class="ant-btn ant-btn-danger" onclick="submitDeleteForm()">Delete Selected Users</button>
-    </form>    
+    </form>
+
 
     <span id="delete-user-error" class="ant-form-item-explain ant-form-item-explain-error" style="visibility: hidden; color: red;">Please select at least one user to delete.</span>
     <span id="roleToUpdateError" class="ant-form-item-explain ant-form-item-explain-error" style="visibility: hidden; color: red;">Please select a role to update.</span>
