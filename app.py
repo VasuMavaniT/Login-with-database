@@ -20,7 +20,7 @@ app.secret_key = secret_key
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False  # You can choose whether sessions are permanent
 app.config['SESSION_USE_SIGNER'] = True  # To prevent tampering
-app.config['SESSION_REDIS'] = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)  # Configure as needed
+app.config['SESSION_REDIS'] = redis.Redis(host='localhost', port=6379, db=0, decode_responses=False)  # Configure as needed
 
 # Initialize session
 Session(app)
